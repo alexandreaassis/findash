@@ -19,6 +19,7 @@ import { NotesSection } from '@/components/NotesSection'
 import { ImportModal } from '@/components/ImportModal'
 import { PasswordModal } from '@/components/PasswordModal'
 import { SimulationPanel } from '@/components/SimulationPanel'
+import { WelcomeTour, TOUR_STORAGE_KEY } from '@/components/WelcomeTour'
 import { cloneDreEntries, countSimulationChanges } from '@/lib/simulationHelpers'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -66,9 +67,10 @@ export default function Index() {
   // Aba de período/ano
   const [selectedYearTab, setSelectedYearTab] = useState<'2025' | '2026' | 'comparison'>('2026')
 
-  // Modais
+  // Modais e Tutorial
   const [importOpen, setImportOpen] = useState<boolean>(false)
   const [passwordOpen, setPasswordOpen] = useState<boolean>(false)
+  const [tourOpen, setTourOpen] = useState<boolean>(false)
 
   // Verifica estado de autenticação na sessão
   useEffect(() => {
@@ -102,6 +104,20 @@ export default function Index() {
   useEffect(() => {
     if (authenticated) {
       loadData()
+
+      // Verifica se o tutorial já foi dispensado no navegador
+      try {
+        const dismissed = localStorage.getItem(TOUR_STORAGE_KEY)
+        if (!dismissed) {
+          // Pequeno timeout suave para o usuário ver a página carregada antes de abrir o tour
+          const timer = setTimeout(() => {
+            setTourOpen(true)
+          }, 600)
+          return () => clearTimeout(timer)
+        }
+      } catch {
+        // Fallback silencioso para navegadores que bloqueiem localStorage
+      }
     }
   }, [authenticated])
 
@@ -164,7 +180,7 @@ export default function Index() {
       {/* Top Header Privado */}
       <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm print:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
+          <div id="tour-client-header" className="flex items-center gap-3 min-w-0">
             {/* Logomarca A3ONE com container suave */}
             <div className="bg-white rounded-lg p-1.5 border border-slate-200/80 dark:border-slate-700 shadow-xs flex items-center justify-center shrink-0">
               <img
@@ -211,6 +227,7 @@ export default function Index() {
             {/* Botão de Simulação quando há dados importados */}
             {hasData && (
               <Button
+                id="tour-btn-simulate"
                 variant={isSimulating ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => {
@@ -233,6 +250,7 @@ export default function Index() {
             )}
 
             <Button
+              id="tour-btn-pdf"
               variant="outline"
               size="sm"
               onClick={handlePrint}
@@ -256,6 +274,7 @@ export default function Index() {
             </Button>
 
             <Button
+              id="tour-btn-admin"
               variant="outline"
               size="sm"
               onClick={() => setPasswordOpen(true)}
@@ -266,6 +285,19 @@ export default function Index() {
               <span className="hidden lg:inline">Admin A3ONE</span>
               <span className="lg:hidden hidden sm:inline">Admin A3ONE</span>
               <span className="sm:hidden">Admin</span>
+            </Button>
+
+            {/* Botão de Ajuda para reabrir o Tutorial Guiado a qualquer momento */}
+            <Button
+              id="tour-btn-help"
+              variant="outline"
+              size="sm"
+              onClick={() => setTourOpen(true)}
+              className="text-xs h-9 border-indigo-200/80 bg-indigo-50/50 hover:bg-indigo-100 text-indigo-800 dark:border-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-300 dark:hover:bg-indigo-900/50 font-semibold"
+              title="Ver tutorial e explicações das funcionalidades da página"
+            >
+              <HelpCircle className="w-3.5 h-3.5 mr-1 text-indigo-600 dark:text-indigo-400" />
+              <span className="hidden sm:inline">Ajuda</span>
             </Button>
 
             <Button
@@ -296,7 +328,10 @@ export default function Index() {
         ) : (
           <>
             {/* Barra de Navegação de Seções */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-2 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 print:hidden">
+            <div
+              id="tour-nav-sections"
+              className="bg-white dark:bg-slate-900 rounded-2xl p-2 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 print:hidden"
+            >
               <nav className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
                 <Button
                   variant={activeSection === 'overview' ? 'default' : 'ghost'}
@@ -387,7 +422,10 @@ export default function Index() {
               </nav>
 
               {/* Seletor de Abas de Ano (2025 | 2026 | Comparativo) */}
-              <div className="flex items-center gap-1.5 shrink-0 self-end md:self-auto">
+              <div
+                id="tour-year-tabs"
+                className="flex items-center gap-1.5 shrink-0 self-end md:self-auto"
+              >
                 <Tabs
                   value={activeSection === 'comparison' ? 'comparison' : selectedYearTab}
                   onValueChange={(val) => {
@@ -574,6 +612,13 @@ export default function Index() {
         onOpenChange={setPasswordOpen}
         currentClientName={clientName}
         onClientNameUpdated={(newName) => setClientName(newName)}
+      />
+
+      {/* Tutorial de Boas-Vindas Guiado (Tour com Balões) */}
+      <WelcomeTour
+        open={tourOpen}
+        onClose={() => setTourOpen(false)}
+        onComplete={() => setTourOpen(false)}
       />
     </div>
   )
