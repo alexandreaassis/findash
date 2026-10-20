@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import a3oneLogo from '@/assets/a3one-solucoes-integradas-49113.png'
 import { getDreEntries, getDreNotes } from '@/services/dre'
 import { isClientAuthenticated, setClientAuthenticated } from '@/services/auth'
 import { DreEntry, DreNote } from '@/types/dre'
@@ -29,7 +30,6 @@ import {
   HelpCircle,
   Loader2,
   Calendar,
-  Building,
 } from 'lucide-react'
 
 export default function Index() {
@@ -111,22 +111,27 @@ export default function Index() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col print:bg-white print:text-black">
       {/* Top Header Privado */}
       <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm print:hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-600/20">
-              <Building className="w-5 h-5" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            {/* Logomarca A3ONE com container suave */}
+            <div className="bg-white rounded-lg p-1.5 border border-slate-200/80 dark:border-slate-700 shadow-xs flex items-center justify-center shrink-0">
+              <img
+                src={a3oneLogo}
+                alt="A3ONE — Soluções Integradas"
+                className="w-28 sm:w-36 h-auto max-h-9 object-contain"
+              />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
-                  DRE da Empresa
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight truncate">
+                  Demonstrativo Financeiro
                 </h1>
-                <span className="text-[10px] font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 px-2 py-0.5 rounded-full">
+                <span className="hidden sm:inline-block text-[10px] font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 px-2 py-0.5 rounded-full">
                   Privado & Confidencial
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Demonstrativo Financeiro (2025 – 2026 • Jan–Set)
+              <p className="text-xs text-muted-foreground truncate hidden xs:block">
+                DRE 2025 – 2026 (Jan–Set)
               </p>
             </div>
           </div>
@@ -308,17 +313,27 @@ export default function Index() {
 
             {/* Cabeçalho de Impressão (Apenas visível em modo print/PDF) */}
             <div className="hidden print:block mb-6 border-b pb-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-2xl font-bold text-slate-900">
-                    Demonstrativo Financeiro da Empresa (DRE)
-                  </h1>
-                  <p className="text-sm text-slate-600">
-                    Exercícios 2025 e 2026 (Período Jan–Set) — Relatório Executivo Oficial
-                  </p>
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="bg-white p-1 rounded border border-slate-200 shrink-0">
+                    <img
+                      src={a3oneLogo}
+                      alt="A3ONE — Soluções Integradas"
+                      className="w-28 sm:w-32 h-auto max-h-12 object-contain"
+                    />
+                  </div>
+                  <div>
+                    <h1 className="text-2xl font-bold text-slate-900 leading-tight">
+                      Demonstrativo Financeiro da Empresa (DRE)
+                    </h1>
+                    <p className="text-sm text-slate-600">
+                      Exercícios 2025 e 2026 (Período Jan–Set) — Relatório Executivo Oficial
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right text-xs text-slate-500">
-                  Documento confidencial gerado via Página Financeira Privada
+                <div className="text-right text-xs text-slate-500 shrink-0">
+                  <p className="font-semibold text-slate-700">A3ONE Soluções Integradas</p>
+                  <p>Documento confidencial gerado via Página Financeira Privada</p>
                 </div>
               </div>
             </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import a3oneLogo from '@/assets/a3one-solucoes-integradas-49113.png'
 import { verifyClientPassword, setClientAuthenticated } from '@/services/auth'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -10,7 +11,7 @@ import {
   CardTitle,
   CardFooter,
 } from '@/components/ui/card'
-import { Lock, Eye, EyeOff, ShieldCheck, ArrowRight, Loader2, FileSpreadsheet } from 'lucide-react'
+import { Lock, Eye, EyeOff, ArrowRight, Loader2, FileSpreadsheet } from 'lucide-react'
 
 interface AuthGateProps {
   onSuccess: () => void
@@ -51,9 +52,14 @@ export const AuthGate: React.FC<AuthGateProps> = ({ onSuccess }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 mb-4 shadow-xl backdrop-blur-sm">
-            <ShieldCheck className="w-8 h-8 text-indigo-400" />
+        <div className="text-center mb-8 flex flex-col items-center">
+          {/* Logomarca A3ONE com fundo branco contido */}
+          <div className="bg-white rounded-2xl px-6 py-3 shadow-2xl inline-flex items-center justify-center mb-5 border border-white/20">
+            <img
+              src={a3oneLogo}
+              alt="A3ONE — Soluções Integradas"
+              className="w-48 sm:w-52 h-auto max-h-16 object-contain"
+            />
           </div>
           <h1 className="text-2xl font-bold text-white tracking-tight">
             Página Financeira Privada
