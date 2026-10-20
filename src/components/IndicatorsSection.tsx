@@ -12,6 +12,7 @@ import {
   CartesianGrid,
   Legend,
 } from 'recharts'
+import { CustomChartTooltip } from '@/components/CustomChartTooltip'
 
 interface IndicatorsSectionProps {
   activeEntries: DreEntry[]
@@ -84,16 +85,25 @@ export const IndicatorsSection: React.FC<IndicatorsSectionProps> = ({
                   tickFormatter={(val) => `R$ ${(val / 1000).toFixed(0)}k`}
                 />
                 <Tooltip
-                  formatter={(val: any) => [formatBRL(Number(val)), '']}
-                  contentStyle={{
-                    backgroundColor: '#0f172a',
-                    borderColor: '#334155',
-                    borderRadius: '8px',
-                    color: '#fff',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    padding: '8px 12px',
-                  }}
+                  content={
+                    <CustomChartTooltip
+                      order={['receita', 'deducoes', 'margem', 'despesas', 'resultado']}
+                      labelMap={{
+                        receita: 'Receita Bruta',
+                        deducoes: 'Deduções',
+                        margem: 'Margem Contribuição',
+                        despesas: 'Despesas Totais',
+                        resultado: 'Resultado Operacional',
+                      }}
+                      colorMap={{
+                        receita: '#1d4ed8',
+                        deducoes: '#e11d48',
+                        margem: '#d97706',
+                        despesas: '#7c3aed',
+                        resultado: '#059669',
+                      }}
+                    />
+                  }
                 />
                 <Legend
                   content={() => {

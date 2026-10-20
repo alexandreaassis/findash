@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { DreEntry } from '@/types/dre'
 import { formatBRL } from '@/lib/formatters'
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts'
+import { CustomChartTooltip } from '@/components/CustomChartTooltip'
 
 interface RevenueDeductionsSectionProps {
   activeEntries: DreEntry[]
@@ -110,14 +111,14 @@ export const RevenueDeductionsSection: React.FC<RevenueDeductionsSectionProps> =
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(val: any) => [formatBRL(Number(val)), '']}
-                    contentStyle={{
-                      backgroundColor: '#0f172a',
-                      borderColor: '#1e293b',
-                      borderRadius: '8px',
-                      color: '#fff',
-                      fontSize: '11px',
-                    }}
+                    content={
+                      <CustomChartTooltip
+                        colorMap={pieData.reduce<Record<string, string>>((acc, item, index) => {
+                          acc[item.name] = COLORS[index % COLORS.length]
+                          return acc
+                        }, {})}
+                      />
+                    }
                   />
                 </PieChart>
               </ResponsiveContainer>

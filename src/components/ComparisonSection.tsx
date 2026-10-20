@@ -14,6 +14,7 @@ import {
   CartesianGrid,
   Legend,
 } from 'recharts'
+import { CustomChartTooltip } from '@/components/CustomChartTooltip'
 
 interface ComparisonSectionProps {
   entries2025: DreEntry[]
@@ -259,16 +260,23 @@ export const ComparisonSection: React.FC<ComparisonSectionProps> = ({
                   tickFormatter={(val) => `R$ ${(val / 1000).toFixed(0)}k`}
                 />
                 <Tooltip
-                  formatter={(val: any) => [formatBRL(Number(val)), '']}
-                  contentStyle={{
-                    backgroundColor: '#0f172a',
-                    borderColor: '#334155',
-                    borderRadius: '8px',
-                    color: '#fff',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    padding: '8px 12px',
-                  }}
+                  content={
+                    <CustomChartTooltip
+                      order={['Receita 2025', 'Receita 2026', 'Resultado 2025', 'Resultado 2026']}
+                      labelMap={{
+                        'Receita 2025': 'Receita 2025',
+                        'Receita 2026': 'Receita 2026',
+                        'Resultado 2025': 'Resultado 2025',
+                        'Resultado 2026': 'Resultado 2026',
+                      }}
+                      colorMap={{
+                        'Receita 2025': '#64748b',
+                        'Receita 2026': '#1d4ed8',
+                        'Resultado 2025': '#34d399',
+                        'Resultado 2026': '#047857',
+                      }}
+                    />
+                  }
                 />
                 <Legend
                   wrapperStyle={{

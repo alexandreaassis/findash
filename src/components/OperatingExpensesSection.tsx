@@ -12,6 +12,7 @@ import {
   CartesianGrid,
   Legend,
 } from 'recharts'
+import { CustomChartTooltip } from '@/components/CustomChartTooltip'
 import { Building2, Users, BadgeDollarSign, WalletCards } from 'lucide-react'
 
 interface OperatingExpensesSectionProps {
@@ -186,16 +187,23 @@ export const OperatingExpensesSection: React.FC<OperatingExpensesSectionProps> =
                   tickFormatter={(val) => `R$ ${(val / 1000).toFixed(0)}k`}
                 />
                 <Tooltip
-                  formatter={(val: any) => [formatBRL(Number(val)), '']}
-                  contentStyle={{
-                    backgroundColor: '#0f172a',
-                    borderColor: '#334155',
-                    borderRadius: '8px',
-                    color: '#fff',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    padding: '8px 12px',
-                  }}
+                  content={
+                    <CustomChartTooltip
+                      order={['Administrativo', 'Comercial', 'Financeiro', 'Funcionários']}
+                      labelMap={{
+                        Administrativo: 'Administrativo',
+                        Comercial: 'Comercial',
+                        Financeiro: 'Financeiro',
+                        Funcionários: 'Funcionários',
+                      }}
+                      colorMap={{
+                        Administrativo: '#1d4ed8',
+                        Comercial: '#9333ea',
+                        Financeiro: '#d97706',
+                        Funcionários: '#059669',
+                      }}
+                    />
+                  }
                 />
                 <Legend
                   wrapperStyle={{

@@ -20,6 +20,7 @@ import {
   Tooltip,
   CartesianGrid,
 } from 'recharts'
+import { CustomChartTooltip } from '@/components/CustomChartTooltip'
 
 interface OverviewSectionProps {
   entries2025: DreEntry[]
@@ -360,16 +361,21 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
                   tickFormatter={(val) => `R$ ${(val / 1000).toFixed(0)}k`}
                 />
                 <Tooltip
-                  formatter={(val: any) => [formatBRL(Number(val)), '']}
-                  contentStyle={{
-                    backgroundColor: '#0f172a',
-                    borderColor: '#334155',
-                    borderRadius: '8px',
-                    color: '#fff',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    padding: '8px 12px',
-                  }}
+                  content={
+                    <CustomChartTooltip
+                      order={['receita', 'margem', 'resultado']}
+                      labelMap={{
+                        receita: 'Receita Bruta',
+                        margem: 'Margem Contribuição',
+                        resultado: 'Resultado Operacional',
+                      }}
+                      colorMap={{
+                        receita: '#1d4ed8',
+                        margem: '#d97706',
+                        resultado: '#059669',
+                      }}
+                    />
+                  }
                 />
                 <Area
                   type="monotone"
