@@ -129,7 +129,7 @@ export interface DreImportResult {
  *   RESULTADO MENSAL ACUMULADO
  * - Abaixo disso: percentuais e tabela CUSTOS (que devem ser ignorados).
  */
-export function parseDreSheetGrid(grid: any[][], fallbackYear: number): SheetParseResult {
+export function parseDreSheetGrid(grid: any[][], sheetYear: number): SheetParseResult {
   const warnings: string[] = []
 
   // 1. Encontra a linha de cabeçalho dos meses
@@ -162,12 +162,12 @@ export function parseDreSheetGrid(grid: any[][], fallbackYear: number): SheetPar
 
   if (headerRowIdx === -1 || monthCols.length === 0) {
     return {
-      year: fallbackYear,
+      year: sheetYear,
       entries: [],
       closedMonthsCount: 0,
       totalRevenueAnnual: 0,
       warnings: [
-        `Não foi possível identificar as colunas de meses (01 a 12) na planilha ${fallbackYear}.`,
+        `Não foi possível identificar as colunas de meses (01 a 12) na planilha ${sheetYear}.`,
       ],
     }
   }
@@ -177,7 +177,7 @@ export function parseDreSheetGrid(grid: any[][], fallbackYear: number): SheetPar
   for (let c = 0; c < headerRow.length; c++) {
     const val = String(headerRow[c] || '').trim()
     if (
-      val === String(fallbackYear) ||
+      val === String(sheetYear) ||
       val.toLowerCase().includes('total') ||
       val === '2025' ||
       val === '2026'
@@ -198,7 +198,7 @@ export function parseDreSheetGrid(grid: any[][], fallbackYear: number): SheetPar
         (grid[headerRowIdx] && grid[headerRowIdx][c]) || (grid[0] && grid[0][c]) || '',
       ).trim()
       if (
-        val === String(fallbackYear) ||
+        val === String(sheetYear) ||
         val === '2025' ||
         val === '2026' ||
         val.toLowerCase().includes('total')
@@ -209,13 +209,9 @@ export function parseDreSheetGrid(grid: any[][], fallbackYear: number): SheetPar
     }
   }
 
-  // Identificação do ano pela planilha ou fallback
-  let detectedYear = fallbackYear
-  for (let r = 0; r < Math.min(5, grid.length); r++) {
-    const rowStr = (grid[r] || []).join(' ')
-    if (rowStr.includes('2026') && !rowStr.includes('2025')) detectedYear = 2026
-    else if (rowStr.includes('2025') && !rowStr.includes('2026')) detectedYear = 2025
-  }
+  // O ano de cada aba é estritamente definido pelo nome da aba ("2025" -> 2025, "2026" -> 2026)
+  // Sem inferência pelo conteúdo das células para evitar falso reconhecimento (ex.: coluna de totais de 2026 rotulada como "2025")
+  const detectedYear = sheetYear
 
   // Mapeamento de rubricas por linha
   type RubricKey =
@@ -415,17 +411,33 @@ export function parseDreSheetGrid(grid: any[][], fallbackYear: number): SheetPar
 
   for (let m = 1; m <= 12; m++) {
     const rawRevenue = rubricValues.gross_revenue.months[m]
-    const rawDed = rubricValues.total_deductions.months[m]
-    const rawExp = rubricValues.total_expenses.months[m]
-    const rawRes = rubricValues.operating_result.months[m]
 
-    // Regra de "sem fechamento":
-    // Na aba 2026, os meses 10, 11 e 12 estão vazios (ou nulos).
-    // Se a receita e todas as principais rubricas forem nulas/vazias, é período não fechado.
-    const isClosed = rawRevenue !== null || rawDed !== null || rawExp !== null || rawRes !== null
+    // Regra de "mês fechado" vs "sem fechamento":
+    // Se na linha de RECEITA o mês não tem valor nenhum (célula vazia / null) — como Out–Dez na aba 2026 —,
+    // o mês inteiro é gravado como "sem fechamento" (has_closing: false).
+    // Não confundir com mês fechado com valor zero: um mês fechado tem receita informada (> 0 ou preenchida)
+    // ou valores operacionais preenchidos nas rubricas. Células de total com 0 explícito (como ocorre em Out-Dez de 2026)
+    // não devem ser interpretadas como mês fechado.
+    const hasRevenueValue = rawRevenue !== null
+    const hasAnySubrubricValue = [
+      rubricValues.deductions_taxes.months[m],
+      rubricValues.deductions_purchases_tax.months[m],
+      rubricValues.deductions_costs.months[m],
+      rubricValues.deductions_returns.months[m],
+      rubricValues.deductions_commissions.months[m],
+      rubricValues.deductions_royalties.months[m],
+      rubricValues.deductions_marketing.months[m],
+      rubricValues.deductions_freight.months[m],
+      rubricValues.expenses_admin.months[m],
+      rubricValues.expenses_commercial.months[m],
+      rubricValues.expenses_financial.months[m],
+      rubricValues.expenses_personnel.months[m],
+    ].some((v) => v !== null && v !== 0)
+
+    const isClosed = hasRevenueValue || hasAnySubrubricValue
 
     if (!isClosed) {
-      // Período ainda não fechado
+      // Período ainda não fechado (sem fechamento contábil)
       entries.push({
         year: detectedYear,
         period_type: 'monthly',
@@ -597,10 +609,25 @@ export async function parseDreWorkbook(file: File | ArrayBuffer): Promise<DreImp
   const targetYears = [2025, 2026]
 
   for (const year of targetYears) {
-    const matchedSheetName = sheetNames.find((s) => {
-      const clean = s.trim().toLowerCase()
-      return clean === String(year) || clean.includes(String(year))
-    })
+    const yearStr = String(year)
+    // 1. Procura primeiro por correspondência exata do nome da aba ("2025", "2026")
+    const exactMatch = sheetNames.find((s) => s.trim().toLowerCase() === yearStr)
+
+    // 2. Se não encontrar exato, busca aba que contenha o ano ignorando abas auxiliares como Análise e Dashboard
+    const matchedSheetName =
+      exactMatch ||
+      sheetNames.find((s) => {
+        const clean = s.trim().toLowerCase()
+        if (
+          clean.includes('analise') ||
+          clean.includes('análise') ||
+          clean.includes('dashboard') ||
+          clean.includes('comparat')
+        ) {
+          return false
+        }
+        return clean.includes(yearStr)
+      })
 
     if (!matchedSheetName) {
       warnings.push(`Aba correspondente ao ano ${year} não foi encontrada no arquivo Excel.`)

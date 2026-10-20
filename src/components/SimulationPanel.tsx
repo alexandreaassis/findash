@@ -49,12 +49,12 @@ export const SimulationPanel: React.FC<SimulationPanelProps> = ({
   const [editMode, setEditMode] = useState<'single-month' | 'batch-scale'>('single-month')
   const [percentageAdjustment, setPercentageAdjustment] = useState<number>(5)
 
-  // Filtra entradas do ano
+  // Filtra entradas do ano apenas com meses que possuem fechamento (has_closing !== false)
   const yearEntries = simulatedEntries.filter(
-    (e) => Number(e.year) === selectedYear && e.month && e.month <= 9,
+    (e) => Number(e.year) === selectedYear && e.month && e.has_closing !== false,
   )
   const origYearEntries = originalEntries.filter(
-    (e) => Number(e.year) === selectedYear && e.month && e.month <= 9,
+    (e) => Number(e.year) === selectedYear && e.month && e.has_closing !== false,
   )
 
   const currentMonthEntry = yearEntries.find((e) => e.month === selectedMonth) ||
@@ -120,7 +120,7 @@ export const SimulationPanel: React.FC<SimulationPanelProps> = ({
   ) => {
     const factor = 1 + pctDelta / 100
     const updated = simulatedEntries.map((e) => {
-      if (Number(e.year) === selectedYear && e.month && e.month <= 9) {
+      if (Number(e.year) === selectedYear && e.month && e.has_closing !== false) {
         const modified = { ...e }
         if (targetGroup === 'revenue') {
           modified.gross_revenue = Math.round(modified.gross_revenue * factor)
@@ -214,7 +214,7 @@ export const SimulationPanel: React.FC<SimulationPanelProps> = ({
             <div className="flex items-center gap-2">
               <Sliders className="w-4 h-4 text-amber-600 dark:text-amber-400" />
               <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                Impacto Acumulado no Exercício {selectedYear} (Jan–Set)
+                Impacto Acumulado no Exercício {selectedYear} ({yearEntries.length} meses fechados)
               </h4>
             </div>
 
@@ -349,7 +349,11 @@ export const SimulationPanel: React.FC<SimulationPanelProps> = ({
 
           <div className="flex items-center gap-2 flex-wrap">
             <div className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((m) => {
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => {
+                const entry = simulatedEntries.find(
+                  (e) => Number(e.year) === selectedYear && e.month === m,
+                )
+                const isClosed = entry ? entry.has_closing !== false : false
                 const isSelected = selectedMonth === m
                 return (
                   <button
@@ -359,10 +363,14 @@ export const SimulationPanel: React.FC<SimulationPanelProps> = ({
                     className={`px-2.5 py-1 text-xs font-medium rounded-lg transition-all ${
                       isSelected
                         ? 'bg-indigo-600 text-white font-semibold shadow-xs'
-                        : 'bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                        : isClosed
+                          ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                          : 'bg-slate-50 text-slate-400 dark:bg-slate-900 dark:text-slate-600 border border-dashed border-slate-300 dark:border-slate-800'
                     }`}
+                    title={isClosed ? undefined : 'Mês sem fechamento'}
                   >
                     {MONTH_NAMES[m - 1].slice(0, 3)}
+                    {!isClosed && ' *'}
                   </button>
                 )
               })}
@@ -376,7 +384,7 @@ export const SimulationPanel: React.FC<SimulationPanelProps> = ({
             <div className="flex items-center gap-2 text-xs">
               <Sliders className="w-3.5 h-3.5 text-indigo-600" />
               <span className="font-semibold text-slate-800 dark:text-slate-200">
-                Ajustes em Lote para {selectedYear} (Todos os 9 meses):
+                Ajustes em Lote para {selectedYear} (Meses fechados: {yearEntries.length}):
               </span>
             </div>
             <div className="flex items-center gap-2 flex-wrap text-xs">

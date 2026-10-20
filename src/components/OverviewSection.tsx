@@ -61,15 +61,34 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
   const marginPct = totalRevenue > 0 ? (totalMargin / totalRevenue) * 100 : 0
   const resultPct = totalRevenue > 0 ? (totalOperatingResult / totalRevenue) * 100 : 0
 
-  // Comparativo com o outro ano para cálculo de delta
-  const otherClosedEntries = (selectedYear === 2026 ? entries2025 : entries2026).filter(
-    (e) => e.has_closing !== false,
+  // Comparativo Jan–Set entre os dois anos para cálculo de delta equivalente (meses 1 a 9)
+  const comparableSamePeriod = (entries: DreEntry[]) =>
+    entries.filter((e) => e.month && e.month <= 9 && e.has_closing !== false)
+
+  const currentComparableRevenue = comparableSamePeriod(activeEntries).reduce(
+    (acc, curr) => acc + (curr.gross_revenue || 0),
+    0,
   )
-  const otherRevenue = otherClosedEntries.reduce((acc, curr) => acc + (curr.gross_revenue || 0), 0)
-  const otherResult = otherClosedEntries.reduce(
+  const currentComparableResult = comparableSamePeriod(activeEntries).reduce(
     (acc, curr) => acc + (curr.operating_result || 0),
     0,
   )
+
+  const otherEntries = selectedYear === 2026 ? entries2025 : entries2026
+  const otherComparableEntries = comparableSamePeriod(otherEntries)
+  const otherRevenue = otherComparableEntries.reduce(
+    (acc, curr) => acc + (curr.gross_revenue || 0),
+    0,
+  )
+  const otherResult = otherComparableEntries.reduce(
+    (acc, curr) => acc + (curr.operating_result || 0),
+    0,
+  )
+
+  const revenueGrowth =
+    otherRevenue > 0 ? ((currentComparableRevenue - otherRevenue) / otherRevenue) * 100 : 0
+  const resultGrowth =
+    otherResult > 0 ? ((currentComparableResult - otherResult) / Math.abs(otherResult)) * 100 : 0
 
   const revenueGrowth = otherRevenue > 0 ? ((totalRevenue - otherRevenue) / otherRevenue) * 100 : 0
   const resultGrowth =
@@ -93,7 +112,7 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
           <div className="space-y-1">
             <div className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
               <ShieldCheck className="w-3.5 h-3.5" />
-              Leitura Executiva Jan–Set {selectedYear}
+              Leitura Executiva {selectedYear === 2026 ? 'Jan–Set 2026' : 'Exercício 2025'}
               {isSimulationActive && (
                 <span className="ml-1.5 px-1.5 py-0.2 bg-amber-500 text-slate-950 font-bold rounded text-[10px]">
                   Cenário Simulado
@@ -101,11 +120,11 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
               )}
             </div>
             <h3 className="text-xl font-bold tracking-tight text-white">
-              Performance Financeira Consolidada da Empresa
+              Performance Financeira Consolidada da Empresa ({selectedYear})
             </h3>
             <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
               No período com fechamento contábil de {selectedYear} ({closedActiveEntries.length}{' '}
-              meses), a receita acumulada foi de{' '}
+              meses fechados), a receita acumulada foi de{' '}
               <span className="font-semibold text-white">{formatBRL(totalRevenue)}</span>, gerando
               um Resultado Operacional de{' '}
               <span
@@ -117,8 +136,8 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
               <span className="font-semibold text-indigo-300">{formatPercent(marginPct)}</span>.
               {unclosedCount > 0 && (
                 <span className="block mt-1 text-amber-300/90">
-                  * {unclosedCount} meses ainda estão em aberto (sem fechamento) e não foram somados
-                  ao acumulado.
+                  * {unclosedCount} meses (Outubro a Dezembro) estão sem fechamento e não entram no
+                  acumulado nem nos gráficos.
                 </span>
               )}
             </p>
@@ -162,6 +181,7 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
                 {selectedYear === 2026 && otherRevenue > 0 ? (
                   <span
                     className={`inline-flex items-center font-medium ${revenueGrowth >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}
+                    title="Comparação Jan–Set 2026 vs Jan–Set 2025"
                   >
                     {revenueGrowth >= 0 ? (
                       <TrendingUp className="w-3.5 h-3.5 mr-0.5" />
@@ -169,12 +189,10 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
                       <TrendingDown className="w-3.5 h-3.5 mr-0.5" />
                     )}
                     {revenueGrowth >= 0 ? '+' : ''}
-                    {revenueGrowth.toFixed(1)}% vs 2025
+                    {revenueGrowth.toFixed(1)}% vs 2025 (Jan–Set)
                   </span>
                 ) : (
-                  <span className="text-muted-foreground">
-                    Período fechado ({closedActiveEntries.length} meses)
-                  </span>
+                  <span className="text-muted-foreground">12 meses fechados no exercício</span>
                 )}
               </div>
             </div>
@@ -256,9 +274,10 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
                 {formatBRL(totalOperatingResult)}
               </div>
               <div className="flex items-center gap-1.5 mt-1 text-xs">
-                {selectedYear === 2026 && otherResult > 0 ? (
+                {selectedYear === 2026 && otherResult !== 0 ? (
                   <span
                     className={`inline-flex items-center font-medium ${resultGrowth >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}
+                    title="Comparação Jan–Set 2026 vs Jan–Set 2025"
                   >
                     {resultGrowth >= 0 ? (
                       <TrendingUp className="w-3.5 h-3.5 mr-0.5" />
@@ -266,11 +285,11 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
                       <TrendingDown className="w-3.5 h-3.5 mr-0.5" />
                     )}
                     {resultGrowth >= 0 ? '+' : ''}
-                    {resultGrowth.toFixed(1)}% vs 2025
+                    {resultGrowth.toFixed(1)}% vs 2025 (Jan–Set)
                   </span>
                 ) : (
                   <span className="font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
-                    {formatPercent(resultPct)} margem op.
+                    {formatPercent(resultPct)} margem op. anual
                   </span>
                 )}
               </div>

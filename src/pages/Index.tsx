@@ -132,12 +132,12 @@ export default function Index() {
   // Define os dados a exibir (simulados se ativo, ou reais do banco)
   const currentWorkingEntries = isSimulating ? simulatedEntries : entries
 
-  // Filtragem dos dados pelos anos
+  // Filtragem dos dados pelos anos (todos os 12 meses de cada ano para visão completa, mantendo has_closing para controle de fechamento)
   const entries2025 = currentWorkingEntries.filter(
-    (e) => Number(e.year) === 2025 && e.month && e.month <= 9,
+    (e) => Number(e.year) === 2025 && e.month && e.month >= 1 && e.month <= 12,
   )
   const entries2026 = currentWorkingEntries.filter(
-    (e) => Number(e.year) === 2026 && e.month && e.month <= 9,
+    (e) => Number(e.year) === 2026 && e.month && e.month >= 1 && e.month <= 12,
   )
 
   const activeEntries = selectedYearTab === '2025' ? entries2025 : entries2026
@@ -198,7 +198,7 @@ export default function Index() {
                   <Edit3 className="w-2.5 h-2.5 opacity-60 group-hover:opacity-100 shrink-0 ml-0.5" />
                 </button>
                 <span className="hidden lg:inline-block text-[10px] font-semibold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 px-2 py-0.5 rounded-full">
-                  Jan–Set 2025 x 2026
+                  Exercícios 2025 e 2026
                 </span>
               </div>
               <p className="text-xs text-muted-foreground truncate hidden xs:block">
