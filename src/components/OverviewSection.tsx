@@ -85,14 +85,11 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
     0,
   )
 
+  // Crescimento comparando período comparável fechado (Jan–Set 2026 vs Jan–Set 2025)
   const revenueGrowth =
     otherRevenue > 0 ? ((currentComparableRevenue - otherRevenue) / otherRevenue) * 100 : 0
   const resultGrowth =
-    otherResult > 0 ? ((currentComparableResult - otherResult) / Math.abs(otherResult)) * 100 : 0
-
-  const revenueGrowth = otherRevenue > 0 ? ((totalRevenue - otherRevenue) / otherRevenue) * 100 : 0
-  const resultGrowth =
-    otherResult > 0 ? ((totalOperatingResult - otherResult) / otherResult) * 100 : 0
+    otherResult !== 0 ? ((currentComparableResult - otherResult) / Math.abs(otherResult)) * 100 : 0
 
   // Dados para o gráfico de evolução: inclui meses fechados
   const chartData = closedActiveEntries.map((e) => ({

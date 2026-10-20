@@ -257,7 +257,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                 <div className="flex items-center justify-between border-b pb-2">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    Resumo para Conferência (Antes de Confirmar)
+                    Conferência da Importação (Antes de Gravar no Banco)
                   </h4>
                   <span className="text-xs font-mono text-muted-foreground">
                     {parsedPreview.length} registros prontos
@@ -265,30 +265,55 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  {importSummary.results.map((r) => (
-                    <div
-                      key={r.year}
-                      className="bg-white dark:bg-slate-950 border rounded-lg p-3 space-y-1.5 shadow-2xs"
-                    >
-                      <div className="flex items-center justify-between font-bold text-slate-900 dark:text-white">
-                        <span>Aba do Ano {r.year}</span>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-semibold">
-                          {r.closedMonthsCount} meses fechados
-                        </span>
-                      </div>
-                      <div className="text-[11px] text-muted-foreground flex justify-between">
-                        <span>Receita Acumulada:</span>
-                        <strong className="text-slate-800 dark:text-slate-100">
-                          {formatBRL(r.totalRevenueAnnual)}
-                        </strong>
-                      </div>
-                      {r.year === 2026 && (
-                        <div className="text-[10px] text-indigo-700 dark:text-indigo-400 font-medium">
-                          • Meses 10, 11 e 12 registrados como períodos não fechados ("—")
+                  {importSummary.results.map((r) => {
+                    const closedList = r.entries.filter((e) => e.has_closing !== false)
+                    const unclosedList = r.entries.filter((e) => e.has_closing === false)
+                    return (
+                      <div
+                        key={r.year}
+                        className="bg-white dark:bg-slate-950 border rounded-lg p-3.5 space-y-2 shadow-2xs"
+                      >
+                        <div className="flex items-center justify-between font-bold text-slate-900 dark:text-white">
+                          <span className="text-sm">Aba do Ano {r.year}</span>
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                              r.closedMonthsCount === 12
+                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                                : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'
+                            }`}
+                          >
+                            {r.closedMonthsCount} meses fechados
+                          </span>
                         </div>
-                      )}
-                    </div>
-                  ))}
+                        <div className="text-[11px] text-muted-foreground flex justify-between">
+                          <span>Receita Acumulada Fechada:</span>
+                          <strong className="text-slate-800 dark:text-slate-100 font-mono">
+                            {formatBRL(r.totalRevenueAnnual)}
+                          </strong>
+                        </div>
+                        <div className="text-[10px] text-slate-600 dark:text-slate-400 space-y-0.5 pt-1 border-t">
+                          <p>
+                            <strong className="text-slate-800 dark:text-slate-200">
+                              Fechados ({closedList.length}):
+                            </strong>{' '}
+                            {closedList.map((e) => e.month_name?.slice(0, 3)).join(', ') ||
+                              'Nenhum'}
+                          </p>
+                          {unclosedList.length > 0 ? (
+                            <p className="text-amber-700 dark:text-amber-400">
+                              <strong>Sem fechamento ({unclosedList.length}):</strong>{' '}
+                              {unclosedList.map((e) => e.month_name?.slice(0, 3)).join(', ')}{' '}
+                              (exibidos como "—")
+                            </p>
+                          ) : (
+                            <p className="text-emerald-700 dark:text-emerald-400 font-medium">
+                              • Exercício integralmente fechado (12 meses)
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
 
                 {importSummary.warnings.length > 0 && (

@@ -159,7 +159,7 @@ export const SimulationPanel: React.FC<SimulationPanelProps> = ({
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs font-bold uppercase tracking-wider bg-white/25 px-2.5 py-0.5 rounded-full">
-                  Modo de Simulação Ativo
+                  Modo de Simulação Ativo ({selectedYear})
                 </span>
                 {totalChanges > 0 ? (
                   <Badge className="bg-white text-amber-900 hover:bg-white text-xs font-semibold">
@@ -167,7 +167,7 @@ export const SimulationPanel: React.FC<SimulationPanelProps> = ({
                   </Badge>
                 ) : (
                   <span className="text-xs text-amber-100 italic">
-                    Nenhum valor modificado ainda
+                    Nenhum valor modificado ainda ({yearEntries.length} meses fechados)
                   </span>
                 )}
               </div>
@@ -365,12 +365,12 @@ export const SimulationPanel: React.FC<SimulationPanelProps> = ({
                         ? 'bg-indigo-600 text-white font-semibold shadow-xs'
                         : isClosed
                           ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
-                          : 'bg-slate-50 text-slate-400 dark:bg-slate-900 dark:text-slate-600 border border-dashed border-slate-300 dark:border-slate-800'
+                          : 'bg-slate-50 text-slate-400 dark:bg-slate-900 dark:text-slate-600 border border-dashed border-slate-300 dark:border-slate-800 opacity-75'
                     }`}
-                    title={isClosed ? undefined : 'Mês sem fechamento'}
+                    title={isClosed ? undefined : 'Mês sem fechamento contábil oficial'}
                   >
                     {MONTH_NAMES[m - 1].slice(0, 3)}
-                    {!isClosed && ' *'}
+                    {!isClosed && ' (aberto)'}
                   </button>
                 )
               })}
