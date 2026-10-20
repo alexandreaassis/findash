@@ -4,24 +4,32 @@ export interface DreEntry {
   period_type: 'monthly' | 'ytd' | 'summary'
   month?: number
   month_name?: string
+  has_closing?: boolean
   gross_revenue: number
-  deductions_taxes: number
-  deductions_costs: number
-  deductions_returns: number
-  deductions_commissions: number
-  deductions_royalties: number
-  deductions_marketing: number
-  deductions_freight?: number
+  // Deduções detalhadas
+  deductions_taxes: number // IMPOSTOS SOBRE VENDAS
+  deductions_purchases_tax?: number // IMPOSTOS SOBRE COMPRAS
+  deductions_costs: number // CUSTO DIRETO
+  deductions_returns: number // DEVOLUÇÕES
+  deductions_commissions: number // COMISSÕES
+  deductions_royalties: number // ROYALTIES
+  deductions_marketing: number // FUNDO DE PROPAGANDA
+  deductions_freight?: number // FRETES (apenas 2026, ausente em 2025)
   total_deductions: number
+  // Margem de contribuição
   contribution_margin: number
   contribution_margin_pct: number
-  expenses_admin: number
-  expenses_commercial: number
-  expenses_financial: number
-  expenses_personnel: number
+  // Despesas operacionais detalhadas
+  expenses_admin: number // ADMINISTRATIVO
+  expenses_commercial: number // COMERCIAL
+  expenses_financial: number // FINANCEIRO
+  expenses_personnel: number // FUNCIONÁRIOS
   total_expenses: number
-  operating_result: number
+  // Resultados
+  operating_result: number // RESULTADO OPERACIONAL
   operating_result_pct: number
+  accumulated_result?: number // RESULTADO MENSAL ACUMULADO
+  annual_total?: number // Total da coluna P capturado da planilha
   notes?: string
   created?: string
   updated?: string

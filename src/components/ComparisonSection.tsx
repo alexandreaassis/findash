@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { DreEntry } from '@/types/dre'
 import { formatBRL, formatPercent } from '@/lib/formatters'
 import { MONTH_NAMES } from '@/lib/formatters'
-import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Layers } from 'lucide-react'
+import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import {
   ResponsiveContainer,
   BarChart,
@@ -26,7 +26,7 @@ export const ComparisonSection: React.FC<ComparisonSectionProps> = ({
   entries2026,
   isSimulationActive = false,
 }) => {
-  // Construir matriz comparativa mês a mês (Jan a Set: meses 1 a 9)
+  // Construir matriz comparativa mês a mês (Jan a Set: meses 1 a 9, pois 2026 só tem fechamento até Setembro)
   const comparisonRows = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((m) => {
     const row25 = entries2025.find((e) => e.month === m) || null
     const row26 = entries2026.find((e) => e.month === m) || null
@@ -69,24 +69,31 @@ export const ComparisonSection: React.FC<ComparisonSectionProps> = ({
     }
   })
 
-  // Totais Acumulados Jan–Set
-  const totalRev25 = entries2025.reduce((a, b) => a + (b.gross_revenue || 0), 0)
-  const totalRev26 = entries2026.reduce((a, b) => a + (b.gross_revenue || 0), 0)
+  // Totais Acumulados no período comparável (meses 1 a 9)
+  const comparable2025 = entries2025.filter(
+    (e) => e.month && e.month <= 9 && e.has_closing !== false,
+  )
+  const comparable2026 = entries2026.filter(
+    (e) => e.month && e.month <= 9 && e.has_closing !== false,
+  )
+
+  const totalRev25 = comparable2025.reduce((a, b) => a + (b.gross_revenue || 0), 0)
+  const totalRev26 = comparable2026.reduce((a, b) => a + (b.gross_revenue || 0), 0)
   const totalRevDiff = totalRev26 - totalRev25
   const totalRevDiffPct = totalRev25 > 0 ? (totalRevDiff / totalRev25) * 100 : 0
 
-  const totalRes25 = entries2025.reduce((a, b) => a + (b.operating_result || 0), 0)
-  const totalRes26 = entries2026.reduce((a, b) => a + (b.operating_result || 0), 0)
+  const totalRes25 = comparable2025.reduce((a, b) => a + (b.operating_result || 0), 0)
+  const totalRes26 = comparable2026.reduce((a, b) => a + (b.operating_result || 0), 0)
   const totalResDiff = totalRes26 - totalRes25
   const totalResDiffPct = totalRes25 > 0 ? (totalResDiff / Math.abs(totalRes25)) * 100 : 0
 
-  const totalMar25 = entries2025.reduce((a, b) => a + (b.contribution_margin || 0), 0)
-  const totalMar26 = entries2026.reduce((a, b) => a + (b.contribution_margin || 0), 0)
+  const totalMar25 = comparable2025.reduce((a, b) => a + (b.contribution_margin || 0), 0)
+  const totalMar26 = comparable2026.reduce((a, b) => a + (b.contribution_margin || 0), 0)
   const totalMar25Pct = totalRev25 > 0 ? (totalMar25 / totalRev25) * 100 : 0
   const totalMar26Pct = totalRev26 > 0 ? (totalMar26 / totalRev26) * 100 : 0
 
-  const totalExp25 = entries2025.reduce((a, b) => a + (b.total_expenses || 0), 0)
-  const totalExp26 = entries2026.reduce((a, b) => a + (b.total_expenses || 0), 0)
+  const totalExp25 = comparable2025.reduce((a, b) => a + (b.total_expenses || 0), 0)
+  const totalExp26 = comparable2026.reduce((a, b) => a + (b.total_expenses || 0), 0)
 
   // Gráfico comparativo de receita e resultado
   const chartData = comparisonRows.map((r) => ({
@@ -112,7 +119,7 @@ export const ComparisonSection: React.FC<ComparisonSectionProps> = ({
             )}
           </div>
           <p className="text-xs text-muted-foreground">
-            Análise executiva de variações nominais e percentuais entre os mesmos 9 meses
+            Análise executiva de variações nominais e percentuais entre os mesmos 9 meses fechados
           </p>
         </div>
       </div>
@@ -339,7 +346,7 @@ export const ComparisonSection: React.FC<ComparisonSectionProps> = ({
             <tfoot>
               <tr className="border-t-2 border-slate-300 bg-slate-100 font-semibold font-mono text-[11px] text-slate-900">
                 <td className="py-3 px-4 font-sans font-bold text-slate-950 uppercase tracking-wider text-[10px]">
-                  Total Acumulado
+                  Total Acumulado (Jan–Set)
                 </td>
                 <td className="py-3 px-4 text-right font-bold">{formatBRL(totalRev25)}</td>
                 <td className="py-3 px-4 text-right text-blue-700 font-bold">

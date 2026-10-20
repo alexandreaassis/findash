@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-20T17:23:54.683Z",
+  "generatedAt": "2026-10-20T18:07:31.589Z",
   "collections": [
     {
       "name": "users",
@@ -253,6 +253,24 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "has_closing",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "accumulated_result",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "annual_total",
+          "type": "number",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [

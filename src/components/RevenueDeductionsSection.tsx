@@ -1,8 +1,8 @@
 import React from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { DreEntry } from '@/types/dre'
-import { formatBRL, formatPercent } from '@/lib/formatters'
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from 'recharts'
+import { formatBRL } from '@/lib/formatters'
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts'
 
 interface RevenueDeductionsSectionProps {
   activeEntries: DreEntry[]
@@ -10,36 +10,51 @@ interface RevenueDeductionsSectionProps {
   isSimulationActive?: boolean
 }
 
-const COLORS = ['#ef4444', '#f97316', '#eab308', '#84cc16', '#06b6d4', '#6366f1', '#ec4899']
+const COLORS = [
+  '#ef4444',
+  '#f97316',
+  '#eab308',
+  '#84cc16',
+  '#06b6d4',
+  '#6366f1',
+  '#ec4899',
+  '#8b5cf6',
+]
 
 export const RevenueDeductionsSection: React.FC<RevenueDeductionsSectionProps> = ({
   activeEntries,
   selectedYear,
   isSimulationActive = false,
 }) => {
+  // Apenas meses com fechamento
+  const closedEntries = activeEntries.filter((e) => e.has_closing !== false)
+
   // Somatórios de deduções para composição
-  const sumTaxes = activeEntries.reduce((a, b) => a + (b.deductions_taxes || 0), 0)
-  const sumCosts = activeEntries.reduce((a, b) => a + (b.deductions_costs || 0), 0)
-  const sumReturns = activeEntries.reduce((a, b) => a + (b.deductions_returns || 0), 0)
-  const sumCommissions = activeEntries.reduce((a, b) => a + (b.deductions_commissions || 0), 0)
-  const sumRoyalties = activeEntries.reduce((a, b) => a + (b.deductions_royalties || 0), 0)
-  const sumMarketing = activeEntries.reduce((a, b) => a + (b.deductions_marketing || 0), 0)
-  const sumFreight = activeEntries.reduce((a, b) => a + (b.deductions_freight || 0), 0)
-  const totalDeductions = activeEntries.reduce((a, b) => a + (b.total_deductions || 0), 0)
-  const totalRevenue = activeEntries.reduce((a, b) => a + (b.gross_revenue || 0), 0)
+  const sumTaxes = closedEntries.reduce((a, b) => a + (b.deductions_taxes || 0), 0)
+  const sumPurchasesTax = closedEntries.reduce((a, b) => a + (b.deductions_purchases_tax || 0), 0)
+  const sumCosts = closedEntries.reduce((a, b) => a + (b.deductions_costs || 0), 0)
+  const sumReturns = closedEntries.reduce((a, b) => a + (b.deductions_returns || 0), 0)
+  const sumCommissions = closedEntries.reduce((a, b) => a + (b.deductions_commissions || 0), 0)
+  const sumRoyalties = closedEntries.reduce((a, b) => a + (b.deductions_royalties || 0), 0)
+  const sumMarketing = closedEntries.reduce((a, b) => a + (b.deductions_marketing || 0), 0)
+  const sumFreight = closedEntries.reduce((a, b) => a + (b.deductions_freight || 0), 0)
+  const totalDeductions = closedEntries.reduce((a, b) => a + (b.total_deductions || 0), 0)
+  const totalRevenue = closedEntries.reduce((a, b) => a + (b.gross_revenue || 0), 0)
 
   // Itens para o gráfico de pizza de composição
   const pieData = [
     { name: 'Impostos s/ Venda', value: sumTaxes },
-    { name: 'Custos Mercadorias/Serviços', value: sumCosts },
-    { name: 'Devoluções/Cancelamentos', value: sumReturns },
+    ...(sumPurchasesTax > 0 ? [{ name: 'Impostos s/ Compra', value: sumPurchasesTax }] : []),
+    { name: 'Custo Direto', value: sumCosts },
+    { name: 'Devoluções', value: sumReturns },
     { name: 'Comissões', value: sumCommissions },
     { name: 'Royalties', value: sumRoyalties },
-    { name: 'Propaganda / Mkt', value: sumMarketing },
+    { name: 'Fundo Propaganda', value: sumMarketing },
   ]
 
+  // Fretes: existe somente em 2026
   if (selectedYear === 2026 && sumFreight > 0) {
-    pieData.push({ name: 'Fretes (Novo em 2026)', value: sumFreight })
+    pieData.push({ name: 'Fretes (só em 2026)', value: sumFreight })
   }
 
   return (
@@ -58,9 +73,10 @@ export const RevenueDeductionsSection: React.FC<RevenueDeductionsSectionProps> =
           </div>
           <p className="text-xs text-muted-foreground">
             Detalhamento executivo de cada rubrica dedutiva incidente sobre o faturamento bruto no
-            período Jan–Set {selectedYear}
-            {selectedYear === 2026 &&
-              ' — inclui a rubrica de fretes incorporada na estrutura de 2026.'}
+            período fechado de {selectedYear}
+            {selectedYear === 2026
+              ? ' — inclui a rubrica FRETES presente no exercício de 2026.'
+              : ' — rubrica FRETES não existe em 2025.'}
           </p>
         </div>
       </div>
@@ -140,60 +156,94 @@ export const RevenueDeductionsSection: React.FC<RevenueDeductionsSectionProps> =
                 <tr className="border-b border-slate-200 bg-slate-100/70 text-slate-700 font-semibold uppercase text-[10px] tracking-wider">
                   <th className="py-3 px-3">Mês</th>
                   <th className="py-3 px-3 text-right">Rec. Bruta</th>
-                  <th className="py-3 px-3 text-right">Impostos</th>
-                  <th className="py-3 px-3 text-right">Custos</th>
+                  <th className="py-3 px-3 text-right">Imp. Vendas</th>
+                  <th className="py-3 px-3 text-right">Custo Direto</th>
                   <th className="py-3 px-3 text-right">Devoluções</th>
                   <th className="py-3 px-3 text-right">Comissões</th>
                   <th className="py-3 px-3 text-right">Royalties</th>
                   <th className="py-3 px-3 text-right">Propaganda</th>
-                  {selectedYear === 2026 && (
+                  {selectedYear === 2026 ? (
                     <th className="py-3 px-3 text-right text-indigo-700">Fretes</th>
+                  ) : (
+                    <th className="py-3 px-3 text-right text-slate-400">Fretes</th>
                   )}
                   <th className="py-3 px-3 text-right text-rose-700">Total Deduções</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
-                {activeEntries.map((row, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-2.5 px-3 font-sans font-medium text-slate-800">
-                      {row.month_name?.slice(0, 3) || `Mês ${row.month}`}
-                    </td>
-                    <td className="py-2.5 px-3 text-right font-semibold text-slate-900">
-                      {formatBRL(row.gross_revenue)}
-                    </td>
-                    <td className="py-2.5 px-3 text-right text-slate-600">
-                      {formatBRL(row.deductions_taxes)}
-                    </td>
-                    <td className="py-2.5 px-3 text-right text-slate-600">
-                      {formatBRL(row.deductions_costs)}
-                    </td>
-                    <td className="py-2.5 px-3 text-right text-slate-600">
-                      {formatBRL(row.deductions_returns)}
-                    </td>
-                    <td className="py-2.5 px-3 text-right text-slate-600">
-                      {formatBRL(row.deductions_commissions)}
-                    </td>
-                    <td className="py-2.5 px-3 text-right text-slate-600">
-                      {formatBRL(row.deductions_royalties)}
-                    </td>
-                    <td className="py-2.5 px-3 text-right text-slate-600">
-                      {formatBRL(row.deductions_marketing)}
-                    </td>
-                    {selectedYear === 2026 && (
-                      <td className="py-2.5 px-3 text-right text-indigo-700 font-medium">
-                        {formatBRL(row.deductions_freight || 0)}
+                {activeEntries.map((row, idx) => {
+                  const isClosed = row.has_closing !== false
+
+                  if (!isClosed) {
+                    return (
+                      <tr key={idx} className="hover:bg-slate-50/80 opacity-60 transition-colors">
+                        <td className="py-2.5 px-3 font-sans font-medium text-slate-500">
+                          {row.month_name?.slice(0, 3) || `Mês ${row.month}`}
+                          <span className="ml-1 text-[9px] text-amber-600 bg-amber-50 px-1 py-0.2 rounded font-sans">
+                            Aberto
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 text-right text-slate-400">—</td>
+                        <td className="py-2.5 px-3 text-right text-slate-400">—</td>
+                        <td className="py-2.5 px-3 text-right text-slate-400">—</td>
+                        <td className="py-2.5 px-3 text-right text-slate-400">—</td>
+                        <td className="py-2.5 px-3 text-right text-slate-400">—</td>
+                        <td className="py-2.5 px-3 text-right text-slate-400">—</td>
+                        <td className="py-2.5 px-3 text-right text-slate-400">—</td>
+                        <td className="py-2.5 px-3 text-right text-slate-400">—</td>
+                        <td className="py-2.5 px-3 text-right text-slate-400">—</td>
+                      </tr>
+                    )
+                  }
+
+                  return (
+                    <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="py-2.5 px-3 font-sans font-medium text-slate-800">
+                        {row.month_name?.slice(0, 3) || `Mês ${row.month}`}
                       </td>
-                    )}
-                    <td className="py-2.5 px-3 text-right font-bold text-rose-600">
-                      -{formatBRL(row.total_deductions)}
-                    </td>
-                  </tr>
-                ))}
+                      <td className="py-2.5 px-3 text-right font-semibold text-slate-900">
+                        {formatBRL(row.gross_revenue)}
+                      </td>
+                      <td className="py-2.5 px-3 text-right text-slate-600">
+                        {formatBRL(row.deductions_taxes)}
+                      </td>
+                      <td className="py-2.5 px-3 text-right text-slate-600">
+                        {formatBRL(row.deductions_costs)}
+                      </td>
+                      <td className="py-2.5 px-3 text-right text-slate-600">
+                        {formatBRL(row.deductions_returns)}
+                      </td>
+                      <td className="py-2.5 px-3 text-right text-slate-600">
+                        {formatBRL(row.deductions_commissions)}
+                      </td>
+                      <td className="py-2.5 px-3 text-right text-slate-600">
+                        {formatBRL(row.deductions_royalties)}
+                      </td>
+                      <td className="py-2.5 px-3 text-right text-slate-600">
+                        {formatBRL(row.deductions_marketing)}
+                      </td>
+                      {selectedYear === 2026 ? (
+                        <td className="py-2.5 px-3 text-right text-indigo-700 font-medium">
+                          {row.deductions_freight !== undefined
+                            ? formatBRL(row.deductions_freight)
+                            : '—'}
+                        </td>
+                      ) : (
+                        <td className="py-2.5 px-3 text-right text-slate-400 italic font-sans text-[10px]">
+                          —
+                        </td>
+                      )}
+                      <td className="py-2.5 px-3 text-right font-bold text-rose-600">
+                        -{formatBRL(row.total_deductions)}
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
               <tfoot>
                 <tr className="border-t-2 border-slate-300 bg-slate-100 font-semibold font-mono text-[11px] text-slate-900">
                   <td className="py-3 px-3 font-sans font-bold text-slate-950 uppercase text-[10px]">
-                    Total
+                    Total Fechado
                   </td>
                   <td className="py-3 px-3 text-right font-bold">{formatBRL(totalRevenue)}</td>
                   <td className="py-3 px-3 text-right font-bold">{formatBRL(sumTaxes)}</td>
@@ -202,9 +252,13 @@ export const RevenueDeductionsSection: React.FC<RevenueDeductionsSectionProps> =
                   <td className="py-3 px-3 text-right font-bold">{formatBRL(sumCommissions)}</td>
                   <td className="py-3 px-3 text-right font-bold">{formatBRL(sumRoyalties)}</td>
                   <td className="py-3 px-3 text-right font-bold">{formatBRL(sumMarketing)}</td>
-                  {selectedYear === 2026 && (
+                  {selectedYear === 2026 ? (
                     <td className="py-3 px-3 text-right text-indigo-700 font-bold">
                       {formatBRL(sumFreight)}
+                    </td>
+                  ) : (
+                    <td className="py-3 px-3 text-right text-slate-400 italic font-sans text-[10px]">
+                      Ausente
                     </td>
                   )}
                   <td className="py-3 px-3 text-right font-extrabold text-rose-600">

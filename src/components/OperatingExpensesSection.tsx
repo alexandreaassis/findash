@@ -25,13 +25,15 @@ export const OperatingExpensesSection: React.FC<OperatingExpensesSectionProps> =
   selectedYear,
   isSimulationActive = false,
 }) => {
-  const sumAdmin = activeEntries.reduce((a, b) => a + (b.expenses_admin || 0), 0)
-  const sumCommercial = activeEntries.reduce((a, b) => a + (b.expenses_commercial || 0), 0)
-  const sumFinancial = activeEntries.reduce((a, b) => a + (b.expenses_financial || 0), 0)
-  const sumPersonnel = activeEntries.reduce((a, b) => a + (b.expenses_personnel || 0), 0)
-  const totalExpenses = activeEntries.reduce((a, b) => a + (b.total_expenses || 0), 0)
+  const closedEntries = activeEntries.filter((e) => e.has_closing !== false)
 
-  const chartData = activeEntries.map((e) => ({
+  const sumAdmin = closedEntries.reduce((a, b) => a + (b.expenses_admin || 0), 0)
+  const sumCommercial = closedEntries.reduce((a, b) => a + (b.expenses_commercial || 0), 0)
+  const sumFinancial = closedEntries.reduce((a, b) => a + (b.expenses_financial || 0), 0)
+  const sumPersonnel = closedEntries.reduce((a, b) => a + (b.expenses_personnel || 0), 0)
+  const totalExpenses = closedEntries.reduce((a, b) => a + (b.total_expenses || 0), 0)
+
+  const chartData = closedEntries.map((e) => ({
     name: e.month_name?.slice(0, 3) || `Mês ${e.month}`,
     Administrativo: e.expenses_admin,
     Comercial: e.expenses_commercial,
@@ -54,8 +56,8 @@ export const OperatingExpensesSection: React.FC<OperatingExpensesSectionProps> =
             )}
           </div>
           <p className="text-xs text-muted-foreground">
-            Acompanhamento executivo dos 4 grupos de despesas operacionais da empresa (Jan–Set{' '}
-            {selectedYear})
+            Acompanhamento executivo dos 4 grupos de despesas operacionais da empresa (
+            {selectedYear}). Meses ainda não fechados constam como "—".
           </p>
         </div>
       </div>
@@ -154,7 +156,8 @@ export const OperatingExpensesSection: React.FC<OperatingExpensesSectionProps> =
             Evolução Mensal das Despesas por Categoria ({selectedYear})
           </h4>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Empilhamento mensal de custos administrativos, comerciais, financeiros e pessoal
+            Empilhamento mensal de custos administrativos, comerciais, financeiros e pessoal (meses
+            fechados)
           </p>
         </div>
         <CardContent className="p-4 sm:p-6">
@@ -219,33 +222,55 @@ export const OperatingExpensesSection: React.FC<OperatingExpensesSectionProps> =
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
-              {activeEntries.map((row, idx) => (
-                <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3 px-4 font-sans font-medium text-slate-800">
-                    {row.month_name || `Mês ${row.month}`}
-                  </td>
-                  <td className="py-3 px-4 text-right text-slate-600">
-                    {formatBRL(row.expenses_admin)}
-                  </td>
-                  <td className="py-3 px-4 text-right text-slate-600">
-                    {formatBRL(row.expenses_commercial)}
-                  </td>
-                  <td className="py-3 px-4 text-right text-slate-600">
-                    {formatBRL(row.expenses_financial)}
-                  </td>
-                  <td className="py-3 px-4 text-right text-slate-600">
-                    {formatBRL(row.expenses_personnel)}
-                  </td>
-                  <td className="py-3 px-4 text-right font-bold text-amber-700">
-                    -{formatBRL(row.total_expenses)}
-                  </td>
-                </tr>
-              ))}
+              {activeEntries.map((row, idx) => {
+                const isClosed = row.has_closing !== false
+
+                if (!isClosed) {
+                  return (
+                    <tr key={idx} className="hover:bg-slate-50/80 opacity-60 transition-colors">
+                      <td className="py-3 px-4 font-sans font-medium text-slate-500">
+                        {row.month_name || `Mês ${row.month}`}
+                        <span className="ml-1 text-[9px] text-amber-600 bg-amber-50 px-1 py-0.2 rounded font-sans">
+                          Aberto
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-right text-slate-400">—</td>
+                      <td className="py-3 px-4 text-right text-slate-400">—</td>
+                      <td className="py-3 px-4 text-right text-slate-400">—</td>
+                      <td className="py-3 px-4 text-right text-slate-400">—</td>
+                      <td className="py-3 px-4 text-right text-slate-400">—</td>
+                    </tr>
+                  )
+                }
+
+                return (
+                  <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3 px-4 font-sans font-medium text-slate-800">
+                      {row.month_name || `Mês ${row.month}`}
+                    </td>
+                    <td className="py-3 px-4 text-right text-slate-600">
+                      {formatBRL(row.expenses_admin)}
+                    </td>
+                    <td className="py-3 px-4 text-right text-slate-600">
+                      {formatBRL(row.expenses_commercial)}
+                    </td>
+                    <td className="py-3 px-4 text-right text-slate-600">
+                      {formatBRL(row.expenses_financial)}
+                    </td>
+                    <td className="py-3 px-4 text-right text-slate-600">
+                      {formatBRL(row.expenses_personnel)}
+                    </td>
+                    <td className="py-3 px-4 text-right font-bold text-amber-700">
+                      -{formatBRL(row.total_expenses)}
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
             <tfoot>
               <tr className="border-t-2 border-slate-300 bg-slate-100 font-semibold font-mono text-[11px] text-slate-900">
                 <td className="py-3 px-4 font-sans font-bold text-slate-950 uppercase text-[10px]">
-                  Total Acumulado
+                  Total Acumulado ({closedEntries.length} meses)
                 </td>
                 <td className="py-3 px-4 text-right font-bold">{formatBRL(sumAdmin)}</td>
                 <td className="py-3 px-4 text-right font-bold">{formatBRL(sumCommercial)}</td>

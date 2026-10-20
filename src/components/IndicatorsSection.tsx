@@ -24,14 +24,16 @@ export const IndicatorsSection: React.FC<IndicatorsSectionProps> = ({
   selectedYear,
   isSimulationActive = false,
 }) => {
-  const chartData = activeEntries.map((e) => ({
-    name: e.month_name?.slice(0, 3) || `Mês ${e.month}`,
-    receita: e.gross_revenue,
-    deducoes: e.total_deductions,
-    margem: e.contribution_margin,
-    despesas: e.total_expenses,
-    resultado: e.operating_result,
-  }))
+  const chartData = activeEntries
+    .filter((e) => e.has_closing !== false)
+    .map((e) => ({
+      name: e.month_name?.slice(0, 3) || `Mês ${e.month}`,
+      receita: e.gross_revenue,
+      deducoes: e.total_deductions,
+      margem: e.contribution_margin,
+      despesas: e.total_expenses,
+      resultado: e.operating_result,
+    }))
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -48,8 +50,8 @@ export const IndicatorsSection: React.FC<IndicatorsSectionProps> = ({
             )}
           </div>
           <p className="text-xs text-muted-foreground">
-            Acompanhe a decomposição financeira por mês de Janeiro a Setembro (Período Fechado
-            Jan–Set {selectedYear})
+            Acompanhe a decomposição financeira por mês. Períodos ainda não fechados são indicados
+            com "—" e não interferem nos acumulados.
           </p>
         </div>
       </div>
@@ -61,7 +63,7 @@ export const IndicatorsSection: React.FC<IndicatorsSectionProps> = ({
             Composição Mensal: Receita vs. Deduções vs. Margem vs. Despesas vs. Resultado
           </h4>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Valores mensais expressos em Reais (R$)
+            Valores mensais fechados expressos em Reais (R$)
           </p>
         </div>
         <CardContent className="p-4 sm:p-6">
@@ -145,7 +147,29 @@ export const IndicatorsSection: React.FC<IndicatorsSectionProps> = ({
             </thead>
             <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
               {activeEntries.map((row, idx) => {
+                const isClosed = row.has_closing !== false
                 const isNegativeResult = row.operating_result < 0
+
+                if (!isClosed) {
+                  return (
+                    <tr key={idx} className="hover:bg-slate-50/80 opacity-60 transition-colors">
+                      <td className="py-3 px-4 font-sans font-medium text-slate-500">
+                        {row.month_name || `Mês ${row.month}`}
+                        <span className="ml-2 text-[10px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded font-sans">
+                          Em aberto
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-right text-slate-400">—</td>
+                      <td className="py-3 px-4 text-right text-slate-400">—</td>
+                      <td className="py-3 px-4 text-right text-slate-400">—</td>
+                      <td className="py-3 px-4 text-right text-slate-400">—</td>
+                      <td className="py-3 px-4 text-right text-slate-400">—</td>
+                      <td className="py-3 px-4 text-right text-slate-400">—</td>
+                      <td className="py-3 px-4 text-right text-slate-400">—</td>
+                    </tr>
+                  )
+                }
+
                 return (
                   <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
                     <td className="py-3 px-4 font-sans font-medium text-slate-800">
@@ -180,14 +204,15 @@ export const IndicatorsSection: React.FC<IndicatorsSectionProps> = ({
                 )
               })}
             </tbody>
-            {/* Linha de Totais Acumulados Jan–Set */}
+            {/* Linha de Totais Acumulados (apenas meses fechados) */}
             <tfoot>
               {(() => {
-                const sumRev = activeEntries.reduce((a, b) => a + (b.gross_revenue || 0), 0)
-                const sumDed = activeEntries.reduce((a, b) => a + (b.total_deductions || 0), 0)
-                const sumMar = activeEntries.reduce((a, b) => a + (b.contribution_margin || 0), 0)
-                const sumExp = activeEntries.reduce((a, b) => a + (b.total_expenses || 0), 0)
-                const sumRes = activeEntries.reduce((a, b) => a + (b.operating_result || 0), 0)
+                const closedEntries = activeEntries.filter((e) => e.has_closing !== false)
+                const sumRev = closedEntries.reduce((a, b) => a + (b.gross_revenue || 0), 0)
+                const sumDed = closedEntries.reduce((a, b) => a + (b.total_deductions || 0), 0)
+                const sumMar = closedEntries.reduce((a, b) => a + (b.contribution_margin || 0), 0)
+                const sumExp = closedEntries.reduce((a, b) => a + (b.total_expenses || 0), 0)
+                const sumRes = closedEntries.reduce((a, b) => a + (b.operating_result || 0), 0)
                 const marPct = sumRev > 0 ? (sumMar / sumRev) * 100 : 0
                 const resPct = sumRev > 0 ? (sumRes / sumRev) * 100 : 0
                 const isNeg = sumRes < 0
@@ -195,7 +220,7 @@ export const IndicatorsSection: React.FC<IndicatorsSectionProps> = ({
                 return (
                   <tr className="border-t-2 border-slate-300 bg-slate-100 font-semibold font-mono text-[11px] text-slate-900">
                     <td className="py-3 px-4 font-sans font-bold text-slate-950 uppercase tracking-wider text-[10px]">
-                      Acumulado Jan–Set
+                      Total Acumulado ({closedEntries.length} meses)
                     </td>
                     <td className="py-3 px-4 text-right font-bold">{formatBRL(sumRev)}</td>
                     <td className="py-3 px-4 text-right text-rose-600 font-bold">

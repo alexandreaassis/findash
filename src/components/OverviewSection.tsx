@@ -36,12 +36,24 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
   activeEntries,
   isSimulationActive = false,
 }) => {
-  // Totais do ano selecionado (Jan–Set)
-  const totalRevenue = activeEntries.reduce((acc, curr) => acc + (curr.gross_revenue || 0), 0)
-  const totalDeductions = activeEntries.reduce((acc, curr) => acc + (curr.total_deductions || 0), 0)
-  const totalMargin = activeEntries.reduce((acc, curr) => acc + (curr.contribution_margin || 0), 0)
-  const totalExpenses = activeEntries.reduce((acc, curr) => acc + (curr.total_expenses || 0), 0)
-  const totalOperatingResult = activeEntries.reduce(
+  // Apenas meses com fechamento realizado entram na soma do consolidado
+  const closedActiveEntries = activeEntries.filter((e) => e.has_closing !== false)
+
+  // Totais do ano selecionado
+  const totalRevenue = closedActiveEntries.reduce((acc, curr) => acc + (curr.gross_revenue || 0), 0)
+  const totalDeductions = closedActiveEntries.reduce(
+    (acc, curr) => acc + (curr.total_deductions || 0),
+    0,
+  )
+  const totalMargin = closedActiveEntries.reduce(
+    (acc, curr) => acc + (curr.contribution_margin || 0),
+    0,
+  )
+  const totalExpenses = closedActiveEntries.reduce(
+    (acc, curr) => acc + (curr.total_expenses || 0),
+    0,
+  )
+  const totalOperatingResult = closedActiveEntries.reduce(
     (acc, curr) => acc + (curr.operating_result || 0),
     0,
   )
@@ -50,21 +62,28 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
   const resultPct = totalRevenue > 0 ? (totalOperatingResult / totalRevenue) * 100 : 0
 
   // Comparativo com o outro ano para cálculo de delta
-  const otherEntries = selectedYear === 2026 ? entries2025 : entries2026
-  const otherRevenue = otherEntries.reduce((acc, curr) => acc + (curr.gross_revenue || 0), 0)
-  const otherResult = otherEntries.reduce((acc, curr) => acc + (curr.operating_result || 0), 0)
+  const otherClosedEntries = (selectedYear === 2026 ? entries2025 : entries2026).filter(
+    (e) => e.has_closing !== false,
+  )
+  const otherRevenue = otherClosedEntries.reduce((acc, curr) => acc + (curr.gross_revenue || 0), 0)
+  const otherResult = otherClosedEntries.reduce(
+    (acc, curr) => acc + (curr.operating_result || 0),
+    0,
+  )
 
   const revenueGrowth = otherRevenue > 0 ? ((totalRevenue - otherRevenue) / otherRevenue) * 100 : 0
   const resultGrowth =
     otherResult > 0 ? ((totalOperatingResult - otherResult) / otherResult) * 100 : 0
 
-  // Dados para mini gráfico de evolução
-  const chartData = activeEntries.map((e) => ({
+  // Dados para o gráfico de evolução: inclui meses fechados
+  const chartData = closedActiveEntries.map((e) => ({
     name: e.month_name?.slice(0, 3) || `Mês ${e.month}`,
     receita: e.gross_revenue,
     margem: e.contribution_margin,
     resultado: e.operating_result,
   }))
+
+  const unclosedCount = activeEntries.filter((e) => e.has_closing === false).length
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -85,8 +104,8 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
               Performance Financeira Consolidada da Empresa
             </h3>
             <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
-              No período de Janeiro a Setembro de {selectedYear}, a empresa faturou um total
-              acumulado de{' '}
+              No período com fechamento contábil de {selectedYear} ({closedActiveEntries.length}{' '}
+              meses), a receita acumulada foi de{' '}
               <span className="font-semibold text-white">{formatBRL(totalRevenue)}</span>, gerando
               um Resultado Operacional de{' '}
               <span
@@ -96,12 +115,18 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
               </span>{' '}
               com Margem de Contribuição de{' '}
               <span className="font-semibold text-indigo-300">{formatPercent(marginPct)}</span>.
+              {unclosedCount > 0 && (
+                <span className="block mt-1 text-amber-300/90">
+                  * {unclosedCount} meses ainda estão em aberto (sem fechamento) e não foram somados
+                  ao acumulado.
+                </span>
+              )}
             </p>
           </div>
 
           <div className="shrink-0 bg-slate-800/80 backdrop-blur rounded-xl p-4 border border-slate-700/60 text-right min-w-[200px]">
             <span className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold block">
-              Resultado Acumulado
+              Resultado Acumulado Fechado
             </span>
             <div
               className={`text-2xl font-bold mt-0.5 ${totalOperatingResult >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}
@@ -148,7 +173,7 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
                   </span>
                 ) : (
                   <span className="text-muted-foreground">
-                    Período de Jan a Set ({activeEntries.length} meses)
+                    Período fechado ({closedActiveEntries.length} meses)
                   </span>
                 )}
               </div>
@@ -197,7 +222,7 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
                 {formatBRL(totalExpenses)}
               </div>
               <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground">
-                <span>Total Jan–Set</span>
+                <span>Total Período Fechado</span>
                 <span>•</span>
                 <span>Admin, Com., Fin., Func.</span>
               </div>
@@ -262,7 +287,7 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
               Evolução Mensal: Receita vs. Margem vs. Resultado ({selectedYear})
             </h4>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Trajetória mês a mês no período Jan–Set em Reais (R$)
+              Valores dos meses fechados em Reais (R$)
             </p>
           </div>
           <div className="flex items-center gap-4 text-xs font-medium">

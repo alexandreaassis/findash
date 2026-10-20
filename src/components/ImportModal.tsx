@@ -10,19 +10,25 @@ import {
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { parseDreDelimitedText, parseDreJson } from '@/lib/dreParser'
-import { SAMPLE_DRE_TEMPLATE } from '@/lib/sampleTemplate'
+import {
+  parseDreDelimitedText,
+  parseDreJson,
+  parseDreWorkbook,
+  DreImportResult,
+} from '@/lib/dreParser'
 import { saveDreEntries, clearAllDreEntries } from '@/services/dre'
 import { DreEntry } from '@/types/dre'
+import { formatBRL } from '@/lib/formatters'
 import {
   Upload,
   FileSpreadsheet,
   CheckCircle2,
   AlertCircle,
+  AlertTriangle,
   RefreshCw,
   Trash2,
-  Sparkles,
   FileText,
+  Info,
 } from 'lucide-react'
 
 interface ImportModalProps {
@@ -36,18 +42,21 @@ export const ImportModal: React.FC<ImportModalProps> = ({
   onOpenChange,
   onImportComplete,
 }) => {
-  const [activeTab, setActiveTab] = useState<'paste' | 'file' | 'template'>('paste')
+  const [activeTab, setActiveTab] = useState<'xlsx' | 'paste' | 'file'>('xlsx')
   const [rawText, setRawText] = useState('')
   const [selectedYear, setSelectedYear] = useState<number>(2025)
   const [loading, setLoading] = useState(false)
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(
     null,
   )
+
+  const [importSummary, setImportSummary] = useState<DreImportResult | null>(null)
   const [parsedPreview, setParsedPreview] = useState<DreEntry[]>([])
 
   const handleTextChange = (text: string) => {
     setRawText(text)
     setFeedback(null)
+    setImportSummary(null)
     if (!text.trim()) {
       setParsedPreview([])
       return
@@ -63,17 +72,62 @@ export const ImportModal: React.FC<ImportModalProps> = ({
         setParsedPreview(entries)
       }
     } catch (e) {
-      // Parse em andamento, não acusa erro imediato
       setParsedPreview([])
     }
   }
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Upload direto do arquivo XLSX original da cliente
+  const handleXlsxUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
     setLoading(true)
     setFeedback(null)
+    setImportSummary(null)
+    setParsedPreview([])
+
+    try {
+      const result = await parseDreWorkbook(file)
+
+      if (result.errors.length > 0) {
+        setFeedback({
+          type: 'error',
+          message: result.errors.join(' | '),
+        })
+        setLoading(false)
+        return
+      }
+
+      setImportSummary(result)
+      setParsedPreview(result.allEntries)
+
+      if (result.allEntries.length === 0) {
+        setFeedback({
+          type: 'error',
+          message: 'Nenhum dado financeiro válido foi identificado nas abas do arquivo.',
+        })
+      }
+    } catch (err: any) {
+      console.error(err)
+      setFeedback({
+        type: 'error',
+        message: err.message || 'Erro ao processar o arquivo Excel.',
+      })
+    } finally {
+      setLoading(false)
+      // Limpa o input para permitir selecionar o mesmo arquivo novamente se necessário
+      e.target.value = ''
+    }
+  }
+
+  // Upload de arquivo CSV ou JSON
+  const handleCsvFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setLoading(true)
+    setFeedback(null)
+    setImportSummary(null)
 
     const reader = new FileReader()
     reader.onload = (event) => {
@@ -87,6 +141,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
       setLoading(false)
     }
     reader.readAsText(file)
+    e.target.value = ''
   }
 
   const handleSaveImport = async (entriesToSave: DreEntry[]) => {
@@ -99,43 +154,21 @@ export const ImportModal: React.FC<ImportModalProps> = ({
     setFeedback(null)
 
     try {
+      // Substitui os dados anteriores no banco
       const count = await saveDreEntries(entriesToSave)
       setFeedback({
         type: 'success',
-        message: `Sucesso! ${count} registros da planilha DRE foram gravados no banco de dados.`,
+        message: `Sucesso! ${count} registros da planilha DRE foram importados e gravados no banco de dados.`,
       })
       setTimeout(() => {
         onImportComplete()
         onOpenChange(false)
-      }, 1200)
+      }, 1400)
     } catch (err: any) {
       console.error(err)
       setFeedback({
         type: 'error',
         message: err.message || 'Erro ao salvar os dados no banco de dados.',
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleLoadOfficialTemplate = async () => {
-    setLoading(true)
-    setFeedback(null)
-    try {
-      const count = await saveDreEntries(SAMPLE_DRE_TEMPLATE)
-      setFeedback({
-        type: 'success',
-        message: `Planilha modelo Jan–Set 2025 e 2026 gravada com sucesso (${count} meses e comparativos)!`,
-      })
-      setTimeout(() => {
-        onImportComplete()
-        onOpenChange(false)
-      }, 1200)
-    } catch (err: any) {
-      setFeedback({
-        type: 'error',
-        message: 'Erro ao carregar a planilha modelo no banco.',
       })
     } finally {
       setLoading(false)
@@ -168,11 +201,12 @@ export const ImportModal: React.FC<ImportModalProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-bold">
             <FileSpreadsheet className="w-5 h-5 text-indigo-600" />
-            Importar Planilha DRE para o Banco
+            Importar Planilha DRE da Empresa
           </DialogTitle>
           <DialogDescription>
-            Os dados serão gravados diretamente no banco de dados (Skip Cloud / PocketBase). A
-            página financeira refletirá os dados reais da planilha assim que salvos.
+            Importe o arquivo <strong>.xlsx original da planilha DRE</strong> ou exporte em CSV. As
+            abas <strong>2025</strong> e <strong>2026</strong> são lidas e gravadas com seus valores
+            reais no banco de dados (Skip Cloud / PocketBase).
           </DialogDescription>
         </DialogHeader>
 
@@ -182,21 +216,104 @@ export const ImportModal: React.FC<ImportModalProps> = ({
           className="w-full mt-2"
         >
           <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="paste">Colar Dados (Excel/CSV)</TabsTrigger>
-            <TabsTrigger value="file">Arquivo (.csv / .json)</TabsTrigger>
-            <TabsTrigger value="template" className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              Planilha Modelo DRE
+            <TabsTrigger value="xlsx" className="font-semibold">
+              Arquivo Excel (.xlsx)
             </TabsTrigger>
+            <TabsTrigger value="paste">Colar Texto / CSV</TabsTrigger>
+            <TabsTrigger value="file">Arquivo CSV / JSON</TabsTrigger>
           </TabsList>
 
+          {/* Aba 1: Upload direto do XLSX original */}
+          <TabsContent value="xlsx" className="space-y-4">
+            <div className="border-2 border-dashed border-indigo-200 dark:border-indigo-900 rounded-2xl p-8 text-center hover:border-indigo-500 hover:bg-indigo-50/30 transition-all cursor-pointer bg-slate-50/50 dark:bg-slate-900/30">
+              <label className="cursor-pointer flex flex-col items-center">
+                <div className="w-14 h-14 rounded-2xl bg-indigo-100 dark:bg-indigo-950 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-3 shadow-xs">
+                  <Upload className="w-7 h-7" />
+                </div>
+                <span className="text-base font-bold text-slate-800 dark:text-slate-100">
+                  Clique ou arraste a planilha .xlsx oficial ("CONSOLIDAÇÃO DRE")
+                </span>
+                <span className="text-xs text-muted-foreground mt-1.5 max-w-md">
+                  O sistema reconhece as abas <strong>2025</strong> e <strong>2026</strong>,
+                  processa receitas, deduções, margens, despesas operacionais e identifica meses
+                  fechados e não fechados.
+                </span>
+                <span className="inline-block mt-3 px-3 py-1 bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 rounded-full text-[11px] font-semibold border border-indigo-200 dark:border-indigo-800">
+                  Importa 2025 e 2026 de uma só vez
+                </span>
+                <input
+                  type="file"
+                  accept=".xlsx,.xls"
+                  onChange={handleXlsxUpload}
+                  className="hidden"
+                  disabled={loading}
+                />
+              </label>
+            </div>
+
+            {/* Resumo do que foi lido para conferência antes de salvar */}
+            {importSummary && (
+              <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-3">
+                <div className="flex items-center justify-between border-b pb-2">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    Resumo para Conferência (Antes de Confirmar)
+                  </h4>
+                  <span className="text-xs font-mono text-muted-foreground">
+                    {parsedPreview.length} registros prontos
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  {importSummary.results.map((r) => (
+                    <div
+                      key={r.year}
+                      className="bg-white dark:bg-slate-950 border rounded-lg p-3 space-y-1.5 shadow-2xs"
+                    >
+                      <div className="flex items-center justify-between font-bold text-slate-900 dark:text-white">
+                        <span>Aba do Ano {r.year}</span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-semibold">
+                          {r.closedMonthsCount} meses fechados
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-muted-foreground flex justify-between">
+                        <span>Receita Acumulada:</span>
+                        <strong className="text-slate-800 dark:text-slate-100">
+                          {formatBRL(r.totalRevenueAnnual)}
+                        </strong>
+                      </div>
+                      {r.year === 2026 && (
+                        <div className="text-[10px] text-indigo-700 dark:text-indigo-400 font-medium">
+                          • Meses 10, 11 e 12 registrados como períodos não fechados ("—")
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {importSummary.warnings.length > 0 && (
+                  <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-lg p-3 text-xs text-amber-900 dark:text-amber-200 space-y-1">
+                    <div className="font-semibold flex items-center gap-1.5">
+                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                      Avisos de Validação da Planilha
+                    </div>
+                    {importSummary.warnings.map((w, i) => (
+                      <p key={i} className="text-[11px] leading-relaxed">
+                        • {w}
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Aba 2: Colar do Excel */}
           <TabsContent value="paste" className="space-y-4">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>
-                Copie e cole as linhas da sua planilha do Excel ou Google Sheets (com cabeçalhos)
-              </span>
+              <span>Cole as linhas copiadas diretamente da planilha Excel</span>
               <div className="flex items-center gap-2">
-                <span>Ano padrão caso omitido:</span>
+                <span>Ano da aba copiada:</span>
                 <select
                   value={selectedYear}
                   onChange={(e) => {
@@ -213,9 +330,13 @@ export const ImportModal: React.FC<ImportModalProps> = ({
             </div>
 
             <Textarea
-              placeholder={`Exemplo de colunas aceitas:
-Mês	Receita Bruta	Impostos	Custos	Devoluções	Comissões	Royalties	Propaganda	Frete	Margem Contribuição	Admin	Comercial	Financeiro	Funcionários	Resultado Operacional
-Jan	160000	14400	54400	3200	4800	3200	4800	3500	71700	17000	10500	5100	20000	19100`}
+              placeholder={`Cole aqui as linhas da aba 2025 ou 2026...
+Exemplo do layout:
+CONSOLIDAÇÃO DRE	DESCRIÇÃO	01	02	03	04	05	06	07	08	09	10	11	12	2025
+RECEITA		...
+DEDUÇÕES		...
+	IMPOSTOS SOBRE VENDAS	...
+	CUSTO DIRETO	...`}
               rows={8}
               value={rawText}
               onChange={(e) => handleTextChange(e.target.value)}
@@ -226,47 +347,27 @@ Jan	160000	14400	54400	3200	4800	3200	4800	3500	71700	17000	10500	5100	20000	191
               <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-lg p-3 text-xs text-emerald-900 dark:text-emerald-200">
                 <div className="flex items-center gap-2 font-semibold">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  {parsedPreview.length} meses/registros detectados com sucesso
-                </div>
-                <div className="mt-2 max-h-36 overflow-y-auto text-[11px] font-mono space-y-1">
-                  {parsedPreview.slice(0, 4).map((p, idx) => (
-                    <div
-                      key={idx}
-                      className="flex justify-between border-b border-emerald-200/50 pb-1"
-                    >
-                      <span>
-                        {p.year} - {p.month_name || `Mês ${p.month}`}:
-                      </span>
-                      <span>
-                        Receita: R$ {p.gross_revenue.toLocaleString('pt-BR')} | Resultado: R${' '}
-                        {p.operating_result.toLocaleString('pt-BR')}
-                      </span>
-                    </div>
-                  ))}
-                  {parsedPreview.length > 4 && (
-                    <div className="text-muted-foreground pt-1 italic">
-                      ... e mais {parsedPreview.length - 4} registros
-                    </div>
-                  )}
+                  {parsedPreview.length} meses identificados na colagem
                 </div>
               </div>
             )}
           </TabsContent>
 
+          {/* Aba 3: Arquivo CSV / JSON */}
           <TabsContent value="file" className="space-y-4">
             <div className="border-2 border-dashed rounded-xl p-8 text-center hover:border-indigo-500 transition-colors cursor-pointer bg-slate-50/50 dark:bg-slate-900/30">
               <label className="cursor-pointer flex flex-col items-center">
                 <Upload className="w-10 h-10 text-indigo-500 mb-2" />
                 <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                  Clique para selecionar arquivo .CSV ou .JSON
+                  Clique para selecionar arquivo .CSV exportado
                 </span>
                 <span className="text-xs text-muted-foreground mt-1">
-                  Planilhas exportadas como CSV separado por vírgula ou ponto-e-vírgula
+                  Exportação CSV da aba DRE com separador vírgula ou ponto-e-vírgula
                 </span>
                 <input
                   type="file"
                   accept=".csv,.txt,.json"
-                  onChange={handleFileUpload}
+                  onChange={handleCsvFileUpload}
                   className="hidden"
                 />
               </label>
@@ -281,40 +382,9 @@ Jan	160000	14400	54400	3200	4800	3200	4800	3500	71700	17000	10500	5100	20000	191
               </div>
             )}
           </TabsContent>
-
-          <TabsContent value="template" className="space-y-4">
-            <div className="bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 rounded-lg p-4 space-y-3">
-              <div className="flex items-start gap-3">
-                <Sparkles className="w-5 h-5 text-indigo-600 mt-0.5" />
-                <div className="space-y-1">
-                  <h4 className="text-sm font-bold text-indigo-950 dark:text-indigo-200">
-                    Planilha Modelo Jan–Set (2025 x 2026)
-                  </h4>
-                  <p className="text-xs text-indigo-800/80 dark:text-indigo-300 leading-relaxed">
-                    Você pode gravar no banco de dados a planilha modelo oficial pré-formatada. Ela
-                    contém todos os meses de Janeiro a Setembro para 2025 e 2026, com receitas,
-                    deduções detalhadas (impostos, custos, devoluções, comissões, royalties,
-                    propaganda e fretes em 2026), margens e despesas administrativas, comerciais,
-                    financeiras e funcionários.
-                  </p>
-                </div>
-              </div>
-
-              <div className="pt-2">
-                <Button
-                  type="button"
-                  onClick={handleLoadOfficialTemplate}
-                  disabled={loading}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs w-full sm:w-auto"
-                >
-                  <Sparkles className="w-3.5 h-3.5 mr-1.5" />
-                  Gravar Planilha Modelo no Banco
-                </Button>
-              </div>
-            </div>
-          </TabsContent>
         </Tabs>
 
+        {/* Mensagem de Feedback */}
         {feedback && (
           <div
             className={`p-3 rounded-lg text-xs flex items-center gap-2 ${
@@ -342,7 +412,7 @@ Jan	160000	14400	54400	3200	4800	3200	4800	3500	71700	17000	10500	5100	20000	191
             className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 text-xs sm:mr-auto"
           >
             <Trash2 className="w-3.5 h-3.5 mr-1.5" />
-            Limpar Banco DRE
+            Limpar Dados Anteriores
           </Button>
 
           <Button
@@ -354,26 +424,24 @@ Jan	160000	14400	54400	3200	4800	3200	4800	3500	71700	17000	10500	5100	20000	191
             Cancelar
           </Button>
 
-          {activeTab !== 'template' && (
-            <Button
-              type="button"
-              disabled={loading || parsedPreview.length === 0}
-              onClick={() => handleSaveImport(parsedPreview)}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white"
-            >
-              {loading ? (
-                <>
-                  <RefreshCw className="w-3.5 h-3.5 mr-1.5 animate-spin" />
-                  Gravando no Banco...
-                </>
-              ) : (
-                <>
-                  <FileText className="w-3.5 h-3.5 mr-1.5" />
-                  Salvar no Banco ({parsedPreview.length} registros)
-                </>
-              )}
-            </Button>
-          )}
+          <Button
+            type="button"
+            disabled={loading || parsedPreview.length === 0}
+            onClick={() => handleSaveImport(parsedPreview)}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-sm"
+          >
+            {loading ? (
+              <>
+                <RefreshCw className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                Gravando no Banco...
+              </>
+            ) : (
+              <>
+                <FileText className="w-3.5 h-3.5 mr-1.5" />
+                Substituir e Gravar no Banco ({parsedPreview.length} registros)
+              </>
+            )}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
