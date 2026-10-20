@@ -146,7 +146,7 @@ export default function Index() {
                   type="button"
                   onClick={() => setPasswordOpen(true)}
                   className="group inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 border border-indigo-200/80 dark:border-indigo-800 text-indigo-900 dark:text-indigo-200 text-xs font-semibold max-w-[220px] sm:max-w-xs transition-colors"
-                  title="Clique para editar o nome da empresa cliente ou alterar a senha"
+                  title="Ajustes de administração A3ONE: alterar nome da empresa ou senhas"
                 >
                   <Building2 className="w-3 h-3 text-indigo-600 dark:text-indigo-400 shrink-0" />
                   <span className="truncate">{clientName}</span>
@@ -191,12 +191,12 @@ export default function Index() {
               size="sm"
               onClick={() => setPasswordOpen(true)}
               className="text-xs h-9 border-slate-200 text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:text-slate-200"
-              title="Editar nome da cliente e senha de acesso"
+              title="Administração A3ONE: editar cliente e senhas"
             >
               <Building2 className="w-3.5 h-3.5 mr-1.5 text-indigo-600" />
-              <span className="hidden lg:inline">Editar Cliente</span>
-              <span className="lg:hidden hidden sm:inline">Cliente / Senha</span>
-              <span className="sm:hidden">Ajustes</span>
+              <span className="hidden lg:inline">Admin A3ONE</span>
+              <span className="lg:hidden hidden sm:inline">Admin A3ONE</span>
+              <span className="sm:hidden">Admin</span>
             </Button>
 
             <Button
