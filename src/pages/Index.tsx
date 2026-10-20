@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import a3oneLogo from '@/assets/a3one-solucoes-integradas-49113.png'
+import a3oneLogo from '@/assets/a3one-solucoes-integradas-2-48667.png'
 import { getDreEntries, getDreNotes } from '@/services/dre'
-import { isClientAuthenticated, setClientAuthenticated } from '@/services/auth'
+import {
+  isClientAuthenticated,
+  setClientAuthenticated,
+  getClientDisplayName,
+  DEFAULT_CLIENT_NAME,
+} from '@/services/auth'
 import { DreEntry, DreNote } from '@/types/dre'
 import { AuthGate } from '@/components/AuthGate'
 import { EmptyState } from '@/components/EmptyState'
@@ -30,12 +35,15 @@ import {
   HelpCircle,
   Loader2,
   Calendar,
+  Building2,
+  Edit3,
 } from 'lucide-react'
 
 export default function Index() {
   const [authenticated, setAuthenticated] = useState<boolean>(false)
   const [authChecking, setAuthChecking] = useState<boolean>(true)
   const [loading, setLoading] = useState<boolean>(true)
+  const [clientName, setClientName] = useState<string>(DEFAULT_CLIENT_NAME)
 
   const [entries, setEntries] = useState<DreEntry[]>([])
   const [notes, setNotes] = useState<DreNote[]>([])
@@ -62,9 +70,14 @@ export default function Index() {
   const loadData = async () => {
     setLoading(true)
     try {
-      const [fetchedEntries, fetchedNotes] = await Promise.all([getDreEntries(), getDreNotes()])
+      const [fetchedEntries, fetchedNotes, fetchedClientName] = await Promise.all([
+        getDreEntries(),
+        getDreNotes(),
+        getClientDisplayName(),
+      ])
       setEntries(fetchedEntries)
       setNotes(fetchedNotes)
+      if (fetchedClientName) setClientName(fetchedClientName)
     } catch (err) {
       console.error('Falha ao carregar dados do DRE:', err)
     } finally {
@@ -126,12 +139,25 @@ export default function Index() {
                 <h1 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight truncate">
                   Demonstrativo Financeiro
                 </h1>
-                <span className="hidden sm:inline-block text-[10px] font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 px-2 py-0.5 rounded-full">
-                  Privado & Confidencial
+                <span className="text-slate-400 dark:text-slate-500 text-xs hidden md:inline">
+                  •
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setPasswordOpen(true)}
+                  className="group inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 border border-indigo-200/80 dark:border-indigo-800 text-indigo-900 dark:text-indigo-200 text-xs font-semibold max-w-[220px] sm:max-w-xs transition-colors"
+                  title="Clique para editar o nome da empresa cliente ou alterar a senha"
+                >
+                  <Building2 className="w-3 h-3 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                  <span className="truncate">{clientName}</span>
+                  <Edit3 className="w-2.5 h-2.5 opacity-60 group-hover:opacity-100 shrink-0 ml-0.5" />
+                </button>
+                <span className="hidden lg:inline-block text-[10px] font-semibold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 px-2 py-0.5 rounded-full">
+                  Jan–Set 2025 x 2026
                 </span>
               </div>
               <p className="text-xs text-muted-foreground truncate hidden xs:block">
-                DRE 2025 – 2026 (Jan–Set)
+                {clientName} • DRE Comparativo Executivo
               </p>
             </div>
           </div>
@@ -161,14 +187,16 @@ export default function Index() {
             </Button>
 
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
               onClick={() => setPasswordOpen(true)}
-              className="text-xs h-9 text-slate-600 hover:text-slate-900"
-              title="Alterar senha da cliente"
+              className="text-xs h-9 border-slate-200 text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:text-slate-200"
+              title="Editar nome da cliente e senha de acesso"
             >
-              <KeyRound className="w-3.5 h-3.5 mr-1" />
-              <span className="hidden md:inline">Senha</span>
+              <Building2 className="w-3.5 h-3.5 mr-1.5 text-indigo-600" />
+              <span className="hidden lg:inline">Editar Cliente</span>
+              <span className="lg:hidden hidden sm:inline">Cliente / Senha</span>
+              <span className="sm:hidden">Ajustes</span>
             </Button>
 
             <Button
@@ -319,10 +347,13 @@ export default function Index() {
                     <img
                       src={a3oneLogo}
                       alt="A3ONE — Soluções Integradas"
-                      className="w-28 sm:w-32 h-auto max-h-12 object-contain"
+                      className="w-32 sm:w-40 h-auto max-h-14 object-contain"
                     />
                   </div>
                   <div>
+                    <div className="text-xs uppercase font-semibold tracking-wider text-indigo-700">
+                      {clientName}
+                    </div>
                     <h1 className="text-2xl font-bold text-slate-900 leading-tight">
                       Demonstrativo Financeiro da Empresa (DRE)
                     </h1>
@@ -332,7 +363,8 @@ export default function Index() {
                   </div>
                 </div>
                 <div className="text-right text-xs text-slate-500 shrink-0">
-                  <p className="font-semibold text-slate-700">A3ONE Soluções Integradas</p>
+                  <p className="font-semibold text-slate-800">{clientName}</p>
+                  <p className="font-medium text-slate-600">A3ONE Soluções Integradas</p>
                   <p>Documento confidencial gerado via Página Financeira Privada</p>
                 </div>
               </div>
@@ -427,8 +459,13 @@ export default function Index() {
       {/* Modal de Importação de Planilha para o Banco */}
       <ImportModal open={importOpen} onOpenChange={setImportOpen} onImportComplete={loadData} />
 
-      {/* Modal de Alteração de Senha */}
-      <PasswordModal open={passwordOpen} onOpenChange={setPasswordOpen} />
+      {/* Modal de Alteração de Nome da Cliente e Senha */}
+      <PasswordModal
+        open={passwordOpen}
+        onOpenChange={setPasswordOpen}
+        currentClientName={clientName}
+        onClientNameUpdated={(newName) => setClientName(newName)}
+      />
     </div>
   )
 }

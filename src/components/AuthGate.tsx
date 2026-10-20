@@ -1,6 +1,11 @@
 import React, { useState } from 'react'
-import a3oneLogo from '@/assets/a3one-solucoes-integradas-49113.png'
-import { verifyClientPassword, setClientAuthenticated } from '@/services/auth'
+import a3oneLogo from '@/assets/a3one-solucoes-integradas-2-48667.png'
+import {
+  verifyClientPassword,
+  setClientAuthenticated,
+  getClientDisplayName,
+  DEFAULT_CLIENT_NAME,
+} from '@/services/auth'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -22,6 +27,13 @@ export const AuthGate: React.FC<AuthGateProps> = ({ onSuccess }) => {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [clientName, setClientName] = useState<string>(DEFAULT_CLIENT_NAME)
+
+  React.useEffect(() => {
+    getClientDisplayName()
+      .then(setClientName)
+      .catch(() => {})
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -64,20 +76,31 @@ export const AuthGate: React.FC<AuthGateProps> = ({ onSuccess }) => {
           <h1 className="text-2xl font-bold text-white tracking-tight">
             Página Financeira Privada
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-indigo-300 font-medium mt-1">
+            Demonstrativo financeiro — {clientName}
+          </p>
+          <p className="text-xs text-slate-400 mt-0.5">
             Demonstrativo de Resultados do Exercício (2025 – 2026)
           </p>
         </div>
 
         <Card className="border-slate-800 bg-slate-900/90 backdrop-blur-xl shadow-2xl text-slate-100">
-          <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-lg font-semibold flex items-center gap-2 text-white">
-              <Lock className="w-4 h-4 text-indigo-400" />
-              Acesso Exclusivo da Cliente
-            </CardTitle>
+          <CardHeader className="space-y-1.5 pb-4">
+            <div className="flex items-center justify-between gap-2">
+              <CardTitle className="text-lg font-semibold flex items-center gap-2 text-white">
+                <Lock className="w-4 h-4 text-indigo-400" />
+                Acesso Exclusivo da Cliente
+              </CardTitle>
+              <span
+                className="text-[11px] font-medium text-indigo-300 bg-indigo-950/80 border border-indigo-800/80 px-2 py-0.5 rounded-full truncate max-w-[170px]"
+                title={clientName}
+              >
+                {clientName}
+              </span>
+            </div>
             <CardDescription className="text-slate-400 text-xs">
               Digite a senha única fornecida para visualizar os demonstrativos, indicadores e
-              gráficos comparativos.
+              gráficos comparativos de {clientName}.
             </CardDescription>
           </CardHeader>
 

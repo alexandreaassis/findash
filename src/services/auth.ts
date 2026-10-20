@@ -3,6 +3,49 @@ import { AppConfig } from '@/types/dre'
 
 const AUTH_STORAGE_KEY = 'dre_client_authenticated'
 const DEFAULT_PASSWORD = 'cliente2026'
+export const DEFAULT_CLIENT_NAME = 'Cliente - 3MR Catuaí'
+
+export async function getClientDisplayName(): Promise<string> {
+  try {
+    const records = await pb.collection('app_config').getFullList<AppConfig>({
+      filter: 'config_key = "client_display_name"',
+    })
+
+    if (records.length > 0 && records[0].config_value?.trim()) {
+      return records[0].config_value.trim()
+    }
+  } catch (error) {
+    console.warn('Erro ao consultar nome da empresa cliente no PocketBase, usando fallback:', error)
+  }
+  return DEFAULT_CLIENT_NAME
+}
+
+export async function updateClientDisplayName(newName: string): Promise<string> {
+  const trimmed = newName.trim() || DEFAULT_CLIENT_NAME
+
+  try {
+    const records = await pb.collection('app_config').getFullList<AppConfig>({
+      filter: 'config_key = "client_display_name"',
+    })
+
+    if (records.length > 0) {
+      const updated = await pb.collection('app_config').update<AppConfig>(records[0].id, {
+        config_value: trimmed,
+      })
+      return updated.config_value || trimmed
+    } else {
+      const created = await pb.collection('app_config').create<AppConfig>({
+        config_key: 'client_display_name',
+        config_value: trimmed,
+        description: 'Nome da empresa cliente exibido nos cabeçalhos e relatórios',
+      })
+      return created.config_value || trimmed
+    }
+  } catch (error) {
+    console.error('Falha ao atualizar nome da empresa no banco:', error)
+    throw error
+  }
+}
 
 export async function verifyClientPassword(password: string): Promise<boolean> {
   const trimmed = password.trim()

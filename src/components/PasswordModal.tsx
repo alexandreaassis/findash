@@ -10,15 +10,23 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { updateClientPassword } from '@/services/auth'
-import { KeyRound, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
+import { updateClientPassword, updateClientDisplayName } from '@/services/auth'
+import { KeyRound, Building2, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
 
 interface PasswordModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  currentClientName?: string
+  onClientNameUpdated?: (newName: string) => void
 }
 
-export const PasswordModal: React.FC<PasswordModalProps> = ({ open, onOpenChange }) => {
+export const PasswordModal: React.FC<PasswordModalProps> = ({
+  open,
+  onOpenChange,
+  currentClientName = 'Cliente - 3MR Catuaí',
+  onClientNameUpdated,
+}) => {
+  const [clientName, setClientName] = useState(currentClientName)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -26,13 +34,25 @@ export const PasswordModal: React.FC<PasswordModalProps> = ({ open, onOpenChange
     null,
   )
 
-  const handleUpdate = async (e: React.FormEvent) => {
+  // Sincroniza nome quando o modal abre ou prop muda
+  React.useEffect(() => {
+    if (open) {
+      setClientName(currentClientName)
+      setFeedback(null)
+    }
+  }, [open, currentClientName])
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!newPassword.trim()) {
-      setFeedback({ type: 'error', message: 'A nova senha não pode ser vazia.' })
+    const trimmedName = clientName.trim()
+    const trimmedPass = newPassword.trim()
+
+    if (!trimmedName) {
+      setFeedback({ type: 'error', message: 'O nome da empresa cliente não pode ser vazio.' })
       return
     }
-    if (newPassword !== confirmPassword) {
+
+    if (trimmedPass && trimmedPass !== confirmPassword.trim()) {
       setFeedback({ type: 'error', message: 'As senhas digitadas não conferem.' })
       return
     }
@@ -41,11 +61,44 @@ export const PasswordModal: React.FC<PasswordModalProps> = ({ open, onOpenChange
     setFeedback(null)
 
     try {
-      await updateClientPassword(newPassword)
+      const tasks: Promise<unknown>[] = []
+      let nameChanged = false
+      let passChanged = false
+
+      if (trimmedName !== currentClientName) {
+        tasks.push(
+          updateClientDisplayName(trimmedName).then((saved) => {
+            nameChanged = true
+            onClientNameUpdated?.(saved)
+          }),
+        )
+      }
+
+      if (trimmedPass) {
+        tasks.push(
+          updateClientPassword(trimmedPass).then(() => {
+            passChanged = true
+          }),
+        )
+      }
+
+      if (tasks.length === 0) {
+        setFeedback({ type: 'success', message: 'Nenhuma alteração pendente para salvar.' })
+        setTimeout(() => onOpenChange(false), 900)
+        return
+      }
+
+      await Promise.all(tasks)
+
+      const successParts: string[] = []
+      if (nameChanged) successParts.push('Nome da empresa salvo')
+      if (passChanged) successParts.push('senha de acesso atualizada')
+
       setFeedback({
         type: 'success',
-        message: 'Senha de acesso da cliente atualizada com sucesso no banco de dados!',
+        message: `${successParts.join(' e ')} com sucesso no banco de dados!`,
       })
+
       setTimeout(() => {
         setNewPassword('')
         setConfirmPassword('')
@@ -53,7 +106,7 @@ export const PasswordModal: React.FC<PasswordModalProps> = ({ open, onOpenChange
         onOpenChange(false)
       }, 1500)
     } catch (err) {
-      setFeedback({ type: 'error', message: 'Erro ao salvar a nova senha no banco.' })
+      setFeedback({ type: 'error', message: 'Erro ao salvar as configurações no banco.' })
     } finally {
       setLoading(false)
     }
@@ -64,43 +117,83 @@ export const PasswordModal: React.FC<PasswordModalProps> = ({ open, onOpenChange
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <KeyRound className="w-5 h-5 text-indigo-600" />
-            Alterar Senha Única da Cliente
+            <Building2 className="w-5 h-5 text-indigo-600" />
+            Configurações da Cliente & Acesso
           </DialogTitle>
           <DialogDescription>
-            Defina uma nova senha de visualização para a dona da empresa ou cliente.
+            Defina o nome da empresa cliente e altere a senha de visualização privada do DRE.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleUpdate} className="space-y-4 py-2">
-          <div className="space-y-2">
-            <Label htmlFor="new-pass" className="text-xs">
-              Nova Senha
-            </Label>
+        <form onSubmit={handleSubmit} className="space-y-4 py-2">
+          {/* Campo Nome da Empresa Cliente */}
+          <div className="space-y-2 p-3 bg-indigo-50/60 dark:bg-indigo-950/30 rounded-xl border border-indigo-100 dark:border-indigo-900/60">
+            <div className="flex items-center justify-between">
+              <Label
+                htmlFor="client-name"
+                className="text-xs font-semibold text-indigo-950 dark:text-indigo-200 flex items-center gap-1.5"
+              >
+                <Building2 className="w-3.5 h-3.5 text-indigo-600" />
+                Nome da Empresa Cliente
+              </Label>
+              <span className="text-[10px] text-muted-foreground">
+                Exibido nos cabeçalhos e relatórios
+              </span>
+            </div>
             <Input
-              id="new-pass"
+              id="client-name"
               type="text"
-              placeholder="Digite a nova senha..."
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className="text-sm"
+              placeholder="Ex.: Cliente - 3MR Catuaí"
+              value={clientName}
+              onChange={(e) => setClientName(e.target.value)}
+              className="text-sm bg-white dark:bg-slate-900"
               required
             />
+            <p className="text-[11px] text-slate-500">
+              Valor padrão inicial:{' '}
+              <span className="font-medium text-slate-700 dark:text-slate-300">
+                Cliente - 3MR Catuaí
+              </span>
+            </p>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="confirm-pass" className="text-xs">
-              Confirmar Nova Senha
-            </Label>
-            <Input
-              id="confirm-pass"
-              type="text"
-              placeholder="Repita a nova senha..."
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="text-sm"
-              required
-            />
+          {/* Seção de Senha */}
+          <div className="space-y-3 pt-1 border-t border-slate-100 dark:border-slate-800">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
+              <KeyRound className="w-3.5 h-3.5 text-indigo-600" />
+              Alterar Senha de Acesso (Opcional)
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="new-pass" className="text-xs text-muted-foreground">
+                Nova Senha (deixe em branco para manter a atual)
+              </Label>
+              <Input
+                id="new-pass"
+                type="text"
+                placeholder="Digite a nova senha (opcional)..."
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="text-sm"
+              />
+            </div>
+
+            {newPassword.trim() && (
+              <div className="space-y-2 animate-fade-in">
+                <Label htmlFor="confirm-pass" className="text-xs text-muted-foreground">
+                  Confirmar Nova Senha
+                </Label>
+                <Input
+                  id="confirm-pass"
+                  type="text"
+                  placeholder="Repita a nova senha..."
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="text-sm"
+                  required={!!newPassword.trim()}
+                />
+              </div>
+            )}
           </div>
 
           {feedback && (
@@ -140,7 +233,7 @@ export const PasswordModal: React.FC<PasswordModalProps> = ({ open, onOpenChange
                   Salvando...
                 </>
               ) : (
-                'Salvar Senha'
+                'Salvar Alterações'
               )}
             </Button>
           </DialogFooter>
