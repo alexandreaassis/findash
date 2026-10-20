@@ -16,11 +16,13 @@ import {
 interface IndicatorsSectionProps {
   activeEntries: DreEntry[]
   selectedYear: number
+  isSimulationActive?: boolean
 }
 
 export const IndicatorsSection: React.FC<IndicatorsSectionProps> = ({
   activeEntries,
   selectedYear,
+  isSimulationActive = false,
 }) => {
   const chartData = activeEntries.map((e) => ({
     name: e.month_name?.slice(0, 3) || `Mês ${e.month}`,
@@ -35,11 +37,19 @@ export const IndicatorsSection: React.FC<IndicatorsSectionProps> = ({
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <h3 className="text-lg font-bold text-slate-900 tracking-tight">
-            Indicadores Mensais Detalhados ({selectedYear})
-          </h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-bold text-slate-900 tracking-tight">
+              Indicadores Mensais Detalhados ({selectedYear})
+            </h3>
+            {isSimulationActive && (
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200 px-2 py-0.5 rounded-full border border-amber-300">
+                Simulação
+              </span>
+            )}
+          </div>
           <p className="text-xs text-muted-foreground">
-            Acompanhe a decomposição financeira por mês de Janeiro a Setembro
+            Acompanhe a decomposição financeira por mês de Janeiro a Setembro (Período Fechado
+            Jan–Set {selectedYear})
           </p>
         </div>
       </div>

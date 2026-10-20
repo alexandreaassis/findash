@@ -7,6 +7,7 @@ import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from 'recha
 interface RevenueDeductionsSectionProps {
   activeEntries: DreEntry[]
   selectedYear: number
+  isSimulationActive?: boolean
 }
 
 const COLORS = ['#ef4444', '#f97316', '#eab308', '#84cc16', '#06b6d4', '#6366f1', '#ec4899']
@@ -14,6 +15,7 @@ const COLORS = ['#ef4444', '#f97316', '#eab308', '#84cc16', '#06b6d4', '#6366f1'
 export const RevenueDeductionsSection: React.FC<RevenueDeductionsSectionProps> = ({
   activeEntries,
   selectedYear,
+  isSimulationActive = false,
 }) => {
   // Somatórios de deduções para composição
   const sumTaxes = activeEntries.reduce((a, b) => a + (b.deductions_taxes || 0), 0)
@@ -44,12 +46,21 @@ export const RevenueDeductionsSection: React.FC<RevenueDeductionsSectionProps> =
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <h3 className="text-lg font-bold text-slate-900 tracking-tight">
-            Receitas e Deduções ({selectedYear})
-          </h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-bold text-slate-900 tracking-tight">
+              Receitas e Deduções ({selectedYear})
+            </h3>
+            {isSimulationActive && (
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200 px-2 py-0.5 rounded-full border border-amber-300">
+                Simulação
+              </span>
+            )}
+          </div>
           <p className="text-xs text-muted-foreground">
-            Detalhamento de cada rubrica dedutiva incidente sobre o faturamento bruto
-            {selectedYear === 2026 && ' — inclui a nova rubrica de fretes incorporada em 2026.'}
+            Detalhamento executivo de cada rubrica dedutiva incidente sobre o faturamento bruto no
+            período Jan–Set {selectedYear}
+            {selectedYear === 2026 &&
+              ' — inclui a rubrica de fretes incorporada na estrutura de 2026.'}
           </p>
         </div>
       </div>

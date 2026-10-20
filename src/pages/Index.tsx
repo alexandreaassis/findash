@@ -18,6 +18,8 @@ import { OperatingExpensesSection } from '@/components/OperatingExpensesSection'
 import { NotesSection } from '@/components/NotesSection'
 import { ImportModal } from '@/components/ImportModal'
 import { PasswordModal } from '@/components/PasswordModal'
+import { SimulationPanel } from '@/components/SimulationPanel'
+import { cloneDreEntries, countSimulationChanges } from '@/lib/simulationHelpers'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
@@ -37,6 +39,9 @@ import {
   Calendar,
   Building2,
   Edit3,
+  Sparkles,
+  RotateCcw,
+  Sliders,
 } from 'lucide-react'
 
 export default function Index() {
@@ -45,8 +50,13 @@ export default function Index() {
   const [loading, setLoading] = useState<boolean>(true)
   const [clientName, setClientName] = useState<string>(DEFAULT_CLIENT_NAME)
 
+  // Dados reais persistidos no banco de dados (Skip Cloud / PocketBase)
   const [entries, setEntries] = useState<DreEntry[]>([])
   const [notes, setNotes] = useState<DreNote[]>([])
+
+  // Estado do Modo de Simulação (100% em memória, não afeta o banco)
+  const [isSimulating, setIsSimulating] = useState<boolean>(false)
+  const [simulatedEntries, setSimulatedEntries] = useState<DreEntry[]>([])
 
   // Navegação entre seções
   const [activeSection, setActiveSection] = useState<
@@ -78,6 +88,10 @@ export default function Index() {
       setEntries(fetchedEntries)
       setNotes(fetchedNotes)
       if (fetchedClientName) setClientName(fetchedClientName)
+      // Se estiver em simulação, sincroniza a base
+      if (isSimulating) {
+        setSimulatedEntries(cloneDreEntries(fetchedEntries))
+      }
     } catch (err) {
       console.error('Falha ao carregar dados do DRE:', err)
     } finally {
@@ -100,12 +114,37 @@ export default function Index() {
     window.print()
   }
 
+  // Ativação / Desativação da Simulação
+  const handleStartSimulation = () => {
+    setSimulatedEntries(cloneDreEntries(entries))
+    setIsSimulating(true)
+  }
+
+  const handleResetSimulation = () => {
+    setSimulatedEntries(cloneDreEntries(entries))
+  }
+
+  const handleExitSimulation = () => {
+    setIsSimulating(false)
+    setSimulatedEntries([])
+  }
+
+  // Define os dados a exibir (simulados se ativo, ou reais do banco)
+  const currentWorkingEntries = isSimulating ? simulatedEntries : entries
+
   // Filtragem dos dados pelos anos
-  const entries2025 = entries.filter((e) => Number(e.year) === 2025 && e.month && e.month <= 9)
-  const entries2026 = entries.filter((e) => Number(e.year) === 2026 && e.month && e.month <= 9)
+  const entries2025 = currentWorkingEntries.filter(
+    (e) => Number(e.year) === 2025 && e.month && e.month <= 9,
+  )
+  const entries2026 = currentWorkingEntries.filter(
+    (e) => Number(e.year) === 2026 && e.month && e.month <= 9,
+  )
 
   const activeEntries = selectedYearTab === '2025' ? entries2025 : entries2026
   const hasData = entries.length > 0
+  const simulationChangesCount = isSimulating
+    ? countSimulationChanges(entries, simulatedEntries)
+    : 0
 
   if (authChecking) {
     return (
@@ -139,6 +178,12 @@ export default function Index() {
                 <h1 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight truncate">
                   Demonstrativo Financeiro
                 </h1>
+                {isSimulating && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-400/40 text-[11px] font-bold">
+                    <Sparkles className="w-3 h-3 text-amber-600 animate-pulse" />
+                    Simulação
+                  </span>
+                )}
                 <span className="text-slate-400 dark:text-slate-500 text-xs hidden md:inline">
                   •
                 </span>
@@ -163,6 +208,30 @@ export default function Index() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Botão de Simulação quando há dados importados */}
+            {hasData && (
+              <Button
+                variant={isSimulating ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => {
+                  if (isSimulating) {
+                    handleExitSimulation()
+                  } else {
+                    handleStartSimulation()
+                  }
+                }}
+                className={`text-xs h-9 transition-all ${
+                  isSimulating
+                    ? 'bg-amber-600 hover:bg-amber-700 text-white font-semibold shadow-sm'
+                    : 'border-amber-300 text-amber-800 hover:bg-amber-50 dark:border-amber-800 dark:text-amber-300 dark:hover:bg-amber-950/40'
+                }`}
+                title="Ativar modo de simulação para alterar números temporariamente"
+              >
+                <Sparkles className="w-3.5 h-3.5 mr-1.5 text-amber-500" />
+                <span>{isSimulating ? 'Fechar Simulação' : 'Simular'}</span>
+              </Button>
+            )}
+
             <Button
               variant="outline"
               size="sm"
@@ -339,6 +408,19 @@ export default function Index() {
               </div>
             </div>
 
+            {/* Se estiver no Modo Simulação, renderiza o Painel de Edição Interativa no topo */}
+            {isSimulating && (
+              <SimulationPanel
+                originalEntries={entries}
+                simulatedEntries={simulatedEntries}
+                onUpdateEntries={(updated) => setSimulatedEntries(updated)}
+                onReset={handleResetSimulation}
+                onExit={handleExitSimulation}
+                selectedYear={selectedYearTab === '2025' ? 2025 : 2026}
+                onSelectYear={(y) => setSelectedYearTab(y === 2025 ? '2025' : '2026')}
+              />
+            )}
+
             {/* Cabeçalho de Impressão (Apenas visível em modo print/PDF) */}
             <div className="hidden print:block mb-6 border-b pb-4">
               <div className="flex items-center justify-between gap-4">
@@ -377,6 +459,7 @@ export default function Index() {
                 entries2026={entries2026}
                 selectedYear={selectedYearTab === '2025' ? 2025 : 2026}
                 activeEntries={activeEntries}
+                isSimulationActive={isSimulating}
               />
             )}
 
@@ -384,17 +467,23 @@ export default function Index() {
               <IndicatorsSection
                 activeEntries={activeEntries}
                 selectedYear={selectedYearTab === '2025' ? 2025 : 2026}
+                isSimulationActive={isSimulating}
               />
             )}
 
             {activeSection === 'comparison' && (
-              <ComparisonSection entries2025={entries2025} entries2026={entries2026} />
+              <ComparisonSection
+                entries2025={entries2025}
+                entries2026={entries2026}
+                isSimulationActive={isSimulating}
+              />
             )}
 
             {activeSection === 'revenue-deductions' && (
               <RevenueDeductionsSection
                 activeEntries={activeEntries}
                 selectedYear={selectedYearTab === '2025' ? 2025 : 2026}
+                isSimulationActive={isSimulating}
               />
             )}
 
@@ -402,6 +491,7 @@ export default function Index() {
               <OperatingExpensesSection
                 activeEntries={activeEntries}
                 selectedYear={selectedYearTab === '2025' ? 2025 : 2026}
+                isSimulationActive={isSimulating}
               />
             )}
 

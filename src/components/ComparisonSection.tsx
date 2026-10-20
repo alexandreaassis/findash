@@ -18,11 +18,13 @@ import {
 interface ComparisonSectionProps {
   entries2025: DreEntry[]
   entries2026: DreEntry[]
+  isSimulationActive?: boolean
 }
 
 export const ComparisonSection: React.FC<ComparisonSectionProps> = ({
   entries2025,
   entries2026,
+  isSimulationActive = false,
 }) => {
   // Construir matriz comparativa mês a mês (Jan a Set: meses 1 a 9)
   const comparisonRows = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((m) => {
@@ -99,11 +101,18 @@ export const ComparisonSection: React.FC<ComparisonSectionProps> = ({
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <h3 className="text-lg font-bold text-slate-900 tracking-tight">
-            Comparação Direta 2025 x 2026 (Recorte Jan–Set)
-          </h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-bold text-slate-900 tracking-tight">
+              Comparação Direta 2025 x 2026 (Recorte Jan–Set)
+            </h3>
+            {isSimulationActive && (
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200 px-2 py-0.5 rounded-full border border-amber-300">
+                Comparativo com Simulação
+              </span>
+            )}
+          </div>
           <p className="text-xs text-muted-foreground">
-            Análise simétrica de variações nominais e percentuais entre os mesmos 9 meses
+            Análise executiva de variações nominais e percentuais entre os mesmos 9 meses
           </p>
         </div>
       </div>

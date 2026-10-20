@@ -26,6 +26,7 @@ interface OverviewSectionProps {
   entries2026: DreEntry[]
   selectedYear: number
   activeEntries: DreEntry[]
+  isSimulationActive?: boolean
 }
 
 export const OverviewSection: React.FC<OverviewSectionProps> = ({
@@ -33,6 +34,7 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
   entries2026,
   selectedYear,
   activeEntries,
+  isSimulationActive = false,
 }) => {
   // Totais do ano selecionado (Jan–Set)
   const totalRevenue = activeEntries.reduce((acc, curr) => acc + (curr.gross_revenue || 0), 0)
@@ -73,6 +75,11 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
             <div className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
               <ShieldCheck className="w-3.5 h-3.5" />
               Leitura Executiva Jan–Set {selectedYear}
+              {isSimulationActive && (
+                <span className="ml-1.5 px-1.5 py-0.2 bg-amber-500 text-slate-950 font-bold rounded text-[10px]">
+                  Cenário Simulado
+                </span>
+              )}
             </div>
             <h3 className="text-xl font-bold tracking-tight text-white">
               Performance Financeira Consolidada da Empresa

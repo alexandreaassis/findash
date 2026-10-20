@@ -17,11 +17,13 @@ import { Building2, Users, BadgeDollarSign, WalletCards } from 'lucide-react'
 interface OperatingExpensesSectionProps {
   activeEntries: DreEntry[]
   selectedYear: number
+  isSimulationActive?: boolean
 }
 
 export const OperatingExpensesSection: React.FC<OperatingExpensesSectionProps> = ({
   activeEntries,
   selectedYear,
+  isSimulationActive = false,
 }) => {
   const sumAdmin = activeEntries.reduce((a, b) => a + (b.expenses_admin || 0), 0)
   const sumCommercial = activeEntries.reduce((a, b) => a + (b.expenses_commercial || 0), 0)
@@ -41,11 +43,19 @@ export const OperatingExpensesSection: React.FC<OperatingExpensesSectionProps> =
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <h3 className="text-lg font-bold text-slate-900 tracking-tight">
-            Despesas Operacionais ({selectedYear})
-          </h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-bold text-slate-900 tracking-tight">
+              Despesas Operacionais ({selectedYear})
+            </h3>
+            {isSimulationActive && (
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200 px-2 py-0.5 rounded-full border border-amber-300">
+                Simulação
+              </span>
+            )}
+          </div>
           <p className="text-xs text-muted-foreground">
-            Acompanhamento dos 4 grupos de despesas fixas e operacionais da empresa
+            Acompanhamento executivo dos 4 grupos de despesas operacionais da empresa (Jan–Set{' '}
+            {selectedYear})
           </p>
         </div>
       </div>
