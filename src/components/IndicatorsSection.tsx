@@ -96,6 +96,28 @@ export const IndicatorsSection: React.FC<IndicatorsSectionProps> = ({
                   }}
                 />
                 <Legend
+                  content={() => {
+                    const items = [
+                      { label: 'Receita Bruta', color: '#1d4ed8' },
+                      { label: 'Deduções', color: '#e11d48' },
+                      { label: 'Margem Contribuição', color: '#d97706' },
+                      { label: 'Despesas Totais', color: '#7c3aed' },
+                      { label: 'Resultado Operacional', color: '#059669' },
+                    ]
+                    return (
+                      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 pt-3 text-[13px] font-semibold text-slate-700">
+                        {items.map((item) => (
+                          <div key={item.label} className="inline-flex items-center gap-1.5">
+                            <span
+                              className="inline-block h-3 w-3 rounded-xs shrink-0"
+                              style={{ backgroundColor: item.color }}
+                            />
+                            <span>{item.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )
+                  }}
                   wrapperStyle={{
                     fontSize: '13px',
                     fontWeight: '600',
