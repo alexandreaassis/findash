@@ -116,23 +116,23 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
                 </span>
               )}
             </div>
-            <h3 className="text-xl font-bold tracking-tight text-white">
+            <h3 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white">
               Performance Financeira Consolidada da Empresa ({selectedYear})
             </h3>
-            <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
+            <p className="text-sm sm:text-base text-slate-200 max-w-2xl leading-relaxed pt-1">
               No período com fechamento contábil de {selectedYear} ({closedActiveEntries.length}{' '}
               meses fechados), a receita acumulada foi de{' '}
-              <span className="font-semibold text-white">{formatBRL(totalRevenue)}</span>, gerando
-              um Resultado Operacional de{' '}
+              <span className="font-bold text-white">{formatBRL(totalRevenue)}</span>, gerando um
+              Resultado Operacional de{' '}
               <span
-                className={`font-semibold ${totalOperatingResult >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}
+                className={`font-bold ${totalOperatingResult >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}
               >
                 {formatBRL(totalOperatingResult)} ({formatPercent(resultPct)})
               </span>{' '}
               com Margem de Contribuição de{' '}
-              <span className="font-semibold text-indigo-300">{formatPercent(marginPct)}</span>.
+              <span className="font-bold text-amber-300">{formatPercent(marginPct)}</span>.
               {unclosedCount > 0 && (
-                <span className="block mt-1 text-amber-300/90">
+                <span className="block mt-1.5 text-amber-300 font-semibold text-xs sm:text-sm">
                   * {unclosedCount} meses (Outubro a Dezembro) estão sem fechamento e não entram no
                   acumulado nem nos gráficos.
                 </span>
@@ -140,18 +140,18 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
             </p>
           </div>
 
-          <div className="shrink-0 bg-slate-800/80 backdrop-blur rounded-xl p-4 border border-slate-700/60 text-right min-w-[200px]">
-            <span className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold block">
+          <div className="shrink-0 bg-slate-800/90 backdrop-blur rounded-xl p-4 sm:p-5 border border-slate-700/70 text-right min-w-[220px]">
+            <span className="text-xs uppercase tracking-wider text-slate-300 font-bold block">
               Resultado Acumulado Fechado
             </span>
             <div
-              className={`text-2xl font-bold mt-0.5 ${totalOperatingResult >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}
+              className={`text-2xl sm:text-3xl font-black mt-1 ${totalOperatingResult >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}
             >
               {formatBRL(totalOperatingResult)}
             </div>
-            <div className="text-[11px] text-slate-300 mt-1 flex items-center justify-end gap-1">
-              <span>Margem líquida:</span>
-              <span className="font-semibold">{formatPercent(resultPct)}</span>
+            <div className="text-xs sm:text-sm text-slate-200 mt-1.5 flex items-center justify-end gap-1.5">
+              <span className="font-medium">Margem líquida:</span>
+              <span className="font-bold text-white">{formatPercent(resultPct)}</span>
             </div>
           </div>
         </div>
@@ -163,33 +163,35 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
         <Card className="border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              <span className="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                 Receita Acumulada
               </span>
-              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                <DollarSign className="w-4 h-4" />
+              <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300 flex items-center justify-center font-bold">
+                <DollarSign className="w-5 h-5" />
               </div>
             </div>
             <div className="mt-3">
-              <div className="text-2xl font-bold tracking-tight text-slate-900">
+              <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                 {formatBRL(totalRevenue)}
               </div>
-              <div className="flex items-center gap-1.5 mt-1 text-xs">
+              <div className="flex items-center gap-1.5 mt-1.5 text-xs sm:text-sm font-medium">
                 {selectedYear === 2026 && otherRevenue > 0 ? (
                   <span
-                    className={`inline-flex items-center font-medium ${revenueGrowth >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}
+                    className={`inline-flex items-center font-bold ${revenueGrowth >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}
                     title="Comparação Jan–Set 2026 vs Jan–Set 2025"
                   >
                     {revenueGrowth >= 0 ? (
-                      <TrendingUp className="w-3.5 h-3.5 mr-0.5" />
+                      <TrendingUp className="w-4 h-4 mr-0.5" />
                     ) : (
-                      <TrendingDown className="w-3.5 h-3.5 mr-0.5" />
+                      <TrendingDown className="w-4 h-4 mr-0.5" />
                     )}
                     {revenueGrowth >= 0 ? '+' : ''}
                     {revenueGrowth.toFixed(1)}% vs 2025 (Jan–Set)
                   </span>
                 ) : (
-                  <span className="text-muted-foreground">12 meses fechados no exercício</span>
+                  <span className="text-slate-600 dark:text-slate-400 font-medium">
+                    12 meses fechados no exercício
+                  </span>
                 )}
               </div>
             </div>
@@ -200,22 +202,24 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
         <Card className="border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              <span className="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                 Margem Contribuição
               </span>
-              <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                <PieChart className="w-4 h-4" />
+              <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 flex items-center justify-center">
+                <PieChart className="w-5 h-5" />
               </div>
             </div>
             <div className="mt-3">
-              <div className="text-2xl font-bold tracking-tight text-slate-900">
+              <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                 {formatBRL(totalMargin)}
               </div>
-              <div className="flex items-center gap-1.5 mt-1 text-xs">
-                <span className="font-semibold text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded">
+              <div className="flex items-center gap-1.5 mt-1.5 text-xs sm:text-sm">
+                <span className="font-bold text-amber-800 bg-amber-100 dark:bg-amber-950/80 dark:text-amber-300 px-2 py-0.5 rounded">
                   {formatPercent(marginPct)} da receita
                 </span>
-                <span className="text-muted-foreground">após custos e deduções</span>
+                <span className="text-slate-600 dark:text-slate-400 font-medium">
+                  após custos e deduções
+                </span>
               </div>
             </div>
           </CardContent>
@@ -225,18 +229,18 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
         <Card className="border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              <span className="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                 Despesas Operacionais
               </span>
-              <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                <Layers className="w-4 h-4" />
+              <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 flex items-center justify-center">
+                <Layers className="w-5 h-5" />
               </div>
             </div>
             <div className="mt-3">
-              <div className="text-2xl font-bold tracking-tight text-slate-900">
+              <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                 {formatBRL(totalExpenses)}
               </div>
-              <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1.5 mt-1.5 text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
                 <span>Total Período Fechado</span>
                 <span>•</span>
                 <span>Admin, Com., Fin., Func.</span>
@@ -249,43 +253,45 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
         <Card className="border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              <span className="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                 Resultado Operacional
               </span>
               <div
-                className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                   totalOperatingResult >= 0
-                    ? 'bg-emerald-50 text-emerald-600'
-                    : 'bg-rose-50 text-rose-600'
+                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300'
+                    : 'bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300'
                 }`}
               >
-                <Wallet className="w-4 h-4" />
+                <Wallet className="w-5 h-5" />
               </div>
             </div>
             <div className="mt-3">
               <div
-                className={`text-2xl font-bold tracking-tight ${
-                  totalOperatingResult >= 0 ? 'text-emerald-600' : 'text-rose-600'
+                className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${
+                  totalOperatingResult >= 0
+                    ? 'text-emerald-700 dark:text-emerald-400'
+                    : 'text-rose-700 dark:text-rose-400'
                 }`}
               >
                 {formatBRL(totalOperatingResult)}
               </div>
-              <div className="flex items-center gap-1.5 mt-1 text-xs">
+              <div className="flex items-center gap-1.5 mt-1.5 text-xs sm:text-sm">
                 {selectedYear === 2026 && otherResult !== 0 ? (
                   <span
-                    className={`inline-flex items-center font-medium ${resultGrowth >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}
+                    className={`inline-flex items-center font-bold ${resultGrowth >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}
                     title="Comparação Jan–Set 2026 vs Jan–Set 2025"
                   >
                     {resultGrowth >= 0 ? (
-                      <TrendingUp className="w-3.5 h-3.5 mr-0.5" />
+                      <TrendingUp className="w-4 h-4 mr-0.5" />
                     ) : (
-                      <TrendingDown className="w-3.5 h-3.5 mr-0.5" />
+                      <TrendingDown className="w-4 h-4 mr-0.5" />
                     )}
                     {resultGrowth >= 0 ? '+' : ''}
                     {resultGrowth.toFixed(1)}% vs 2025 (Jan–Set)
                   </span>
                 ) : (
-                  <span className="font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+                  <span className="font-bold text-emerald-800 bg-emerald-100 dark:bg-emerald-950/80 dark:text-emerald-300 px-2 py-0.5 rounded">
                     {formatPercent(resultPct)} margem op. anual
                   </span>
                 )}
@@ -306,49 +312,49 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
               Valores dos meses fechados em Reais (R$)
             </p>
           </div>
-          <div className="flex items-center gap-4 text-xs font-medium">
-            <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-blue-600 inline-block" />
-              Receita
+          <div className="flex items-center gap-4 text-xs sm:text-sm font-semibold flex-wrap">
+            <span className="flex items-center gap-1.5 text-blue-900 dark:text-blue-200">
+              <span className="w-3.5 h-3.5 rounded-full bg-blue-600 inline-block shadow-xs" />
+              Receita Bruta
             </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-indigo-500 inline-block" />
-              Margem Contrib.
+            <span className="flex items-center gap-1.5 text-amber-900 dark:text-amber-200">
+              <span className="w-3.5 h-3.5 rounded-full bg-amber-500 inline-block shadow-xs" />
+              Margem Contribuição
             </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-emerald-500 inline-block" />
-              Resultado
+            <span className="flex items-center gap-1.5 text-emerald-900 dark:text-emerald-200">
+              <span className="w-3.5 h-3.5 rounded-full bg-emerald-600 inline-block shadow-xs" />
+              Resultado Operacional
             </span>
           </div>
         </div>
 
         <CardContent className="p-4 sm:p-6">
-          <div className="h-72 w-full">
+          <div className="h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <AreaChart data={chartData} margin={{ top: 12, right: 12, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorReceita" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#2563eb" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#1d4ed8" stopOpacity={0.35} />
+                    <stop offset="95%" stopColor="#1d4ed8" stopOpacity={0.0} />
                   </linearGradient>
                   <linearGradient id="colorMargem" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.35} />
+                    <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.0} />
                   </linearGradient>
                   <linearGradient id="colorResultado" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#059669" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#059669" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis
                   dataKey="name"
-                  tick={{ fontSize: 11, fill: '#64748b' }}
-                  axisLine={false}
+                  tick={{ fontSize: 13, fill: '#334155', fontWeight: 600 }}
+                  axisLine={{ stroke: '#cbd5e1' }}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fontSize: 11, fill: '#64748b' }}
+                  tick={{ fontSize: 12, fill: '#334155', fontWeight: 600 }}
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={(val) => `R$ ${(val / 1000).toFixed(0)}k`}
@@ -357,18 +363,20 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
                   formatter={(val: any) => [formatBRL(Number(val)), '']}
                   contentStyle={{
                     backgroundColor: '#0f172a',
-                    borderColor: '#1e293b',
+                    borderColor: '#334155',
                     borderRadius: '8px',
                     color: '#fff',
-                    fontSize: '12px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    padding: '8px 12px',
                   }}
                 />
                 <Area
                   type="monotone"
                   dataKey="receita"
                   name="Receita Bruta"
-                  stroke="#2563eb"
-                  strokeWidth={2.5}
+                  stroke="#1d4ed8"
+                  strokeWidth={3}
                   fillOpacity={1}
                   fill="url(#colorReceita)"
                 />
@@ -376,8 +384,8 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
                   type="monotone"
                   dataKey="margem"
                   name="Margem Contribuição"
-                  stroke="#6366f1"
-                  strokeWidth={2}
+                  stroke="#d97706"
+                  strokeWidth={3}
                   fillOpacity={1}
                   fill="url(#colorMargem)"
                 />
@@ -385,8 +393,8 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
                   type="monotone"
                   dataKey="resultado"
                   name="Resultado Operacional"
-                  stroke="#10b981"
-                  strokeWidth={2.5}
+                  stroke="#059669"
+                  strokeWidth={3}
                   fillOpacity={1}
                   fill="url(#colorResultado)"
                 />

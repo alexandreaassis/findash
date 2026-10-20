@@ -129,31 +129,35 @@ export const ComparisonSection: React.FC<ComparisonSectionProps> = ({
         {/* Card: Variação de Receita */}
         <Card className="border-slate-200/80 shadow-sm">
           <CardContent className="p-5">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
               Variação de Receita (Jan–Set)
             </span>
             <div className="flex items-baseline justify-between mt-2">
-              <div className="text-2xl font-bold text-slate-900">{formatBRL(totalRevDiff)}</div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+                {formatBRL(totalRevDiff)}
+              </div>
               <div
-                className={`flex items-center text-xs font-bold px-2 py-0.5 rounded-full ${
-                  totalRevDiff >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+                className={`flex items-center text-xs sm:text-sm font-bold px-2.5 py-0.5 rounded-full ${
+                  totalRevDiff >= 0
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                    : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
                 }`}
               >
                 {totalRevDiff >= 0 ? (
-                  <ArrowUpRight className="w-3.5 h-3.5 mr-0.5" />
+                  <ArrowUpRight className="w-4 h-4 mr-0.5" />
                 ) : (
-                  <ArrowDownRight className="w-3.5 h-3.5 mr-0.5" />
+                  <ArrowDownRight className="w-4 h-4 mr-0.5" />
                 )}
                 {totalRevDiff >= 0 ? '+' : ''}
                 {totalRevDiffPct.toFixed(1)}%
               </div>
             </div>
-            <div className="flex justify-between items-center text-xs text-muted-foreground mt-3 pt-3 border-t">
+            <div className="flex justify-between items-center text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-3 pt-3 border-t">
               <span>
-                2025: <strong className="text-slate-800">{formatBRL(totalRev25)}</strong>
+                2025: <strong className="text-slate-900 font-bold">{formatBRL(totalRev25)}</strong>
               </span>
               <span>
-                2026: <strong className="text-indigo-600">{formatBRL(totalRev26)}</strong>
+                2026: <strong className="text-blue-700 font-bold">{formatBRL(totalRev26)}</strong>
               </span>
             </div>
           </CardContent>
@@ -162,35 +166,38 @@ export const ComparisonSection: React.FC<ComparisonSectionProps> = ({
         {/* Card: Variação de Resultado Operacional */}
         <Card className="border-slate-200/80 shadow-sm">
           <CardContent className="p-5">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
               Variação de Resultado Operacional
             </span>
             <div className="flex items-baseline justify-between mt-2">
               <div
-                className={`text-2xl font-bold ${totalResDiff >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}
+                className={`text-2xl sm:text-3xl font-extrabold ${totalResDiff >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}
               >
                 {formatBRL(totalResDiff)}
               </div>
               <div
-                className={`flex items-center text-xs font-bold px-2 py-0.5 rounded-full ${
-                  totalResDiff >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+                className={`flex items-center text-xs sm:text-sm font-bold px-2.5 py-0.5 rounded-full ${
+                  totalResDiff >= 0
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                    : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
                 }`}
               >
                 {totalResDiff >= 0 ? (
-                  <ArrowUpRight className="w-3.5 h-3.5 mr-0.5" />
+                  <ArrowUpRight className="w-4 h-4 mr-0.5" />
                 ) : (
-                  <ArrowDownRight className="w-3.5 h-3.5 mr-0.5" />
+                  <ArrowDownRight className="w-4 h-4 mr-0.5" />
                 )}
                 {totalResDiff >= 0 ? '+' : ''}
                 {totalResDiffPct.toFixed(1)}%
               </div>
             </div>
-            <div className="flex justify-between items-center text-xs text-muted-foreground mt-3 pt-3 border-t">
+            <div className="flex justify-between items-center text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-3 pt-3 border-t">
               <span>
-                2025: <strong className="text-slate-800">{formatBRL(totalRes25)}</strong>
+                2025: <strong className="text-slate-900 font-bold">{formatBRL(totalRes25)}</strong>
               </span>
               <span>
-                2026: <strong className="text-emerald-700">{formatBRL(totalRes26)}</strong>
+                2026:{' '}
+                <strong className="text-emerald-700 font-bold">{formatBRL(totalRes26)}</strong>
               </span>
             </div>
           </CardContent>
@@ -199,23 +206,25 @@ export const ComparisonSection: React.FC<ComparisonSectionProps> = ({
         {/* Card: Estrutura de Margem e Custos */}
         <Card className="border-slate-200/80 shadow-sm">
           <CardContent className="p-5">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
               Estrutura de Margem Contribuição
             </span>
             <div className="flex items-baseline justify-between mt-2">
-              <div className="text-2xl font-bold text-indigo-700">
+              <div className="text-2xl sm:text-3xl font-extrabold text-amber-900 dark:text-amber-400">
                 {formatPercent(totalMar26Pct)}
               </div>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
                 em 2026 (vs {formatPercent(totalMar25Pct)} em 2025)
               </span>
             </div>
-            <div className="flex justify-between items-center text-xs text-muted-foreground mt-3 pt-3 border-t">
+            <div className="flex justify-between items-center text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-3 pt-3 border-t">
               <span>
-                Despesas '25: <strong className="text-slate-800">{formatBRL(totalExp25)}</strong>
+                Despesas '25:{' '}
+                <strong className="text-slate-900 font-bold">{formatBRL(totalExp25)}</strong>
               </span>
               <span>
-                Despesas '26: <strong className="text-amber-700">{formatBRL(totalExp26)}</strong>
+                Despesas '26:{' '}
+                <strong className="text-purple-800 font-bold">{formatBRL(totalExp26)}</strong>
               </span>
             </div>
           </CardContent>
@@ -225,26 +234,26 @@ export const ComparisonSection: React.FC<ComparisonSectionProps> = ({
       {/* Gráfico Comparativo 2025 vs 2026 */}
       <Card className="border-slate-200/80 shadow-sm">
         <div className="p-5 border-b">
-          <h4 className="font-semibold text-slate-900 text-sm">
+          <h4 className="font-bold text-slate-900 text-sm sm:text-base">
             Evolução Comparada: 2025 x 2026 (Jan a Set)
           </h4>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
             Comparação das curvas de receita bruta e resultado operacional
           </p>
         </div>
         <CardContent className="p-4 sm:p-6">
-          <div className="h-80 w-full">
+          <div className="h-80 sm:h-96 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 20, right: 10, left: 10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis
                   dataKey="name"
-                  tick={{ fontSize: 11, fill: '#64748b' }}
-                  axisLine={false}
+                  tick={{ fontSize: 13, fill: '#334155', fontWeight: 600 }}
+                  axisLine={{ stroke: '#cbd5e1' }}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fontSize: 11, fill: '#64748b' }}
+                  tick={{ fontSize: 12, fill: '#334155', fontWeight: 600 }}
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={(val) => `R$ ${(val / 1000).toFixed(0)}k`}
@@ -253,17 +262,25 @@ export const ComparisonSection: React.FC<ComparisonSectionProps> = ({
                   formatter={(val: any) => [formatBRL(Number(val)), '']}
                   contentStyle={{
                     backgroundColor: '#0f172a',
-                    borderColor: '#1e293b',
+                    borderColor: '#334155',
                     borderRadius: '8px',
                     color: '#fff',
-                    fontSize: '12px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    padding: '8px 12px',
                   }}
                 />
-                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                <Bar dataKey="Receita 2025" fill="#94a3b8" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="Receita 2026" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="Resultado 2025" fill="#a7f3d0" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="Resultado 2026" fill="#10b981" radius={[4, 4, 0, 0]} />
+                <Legend
+                  wrapperStyle={{
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    paddingTop: '12px',
+                  }}
+                />
+                <Bar dataKey="Receita 2025" fill="#64748b" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Receita 2026" fill="#1d4ed8" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Resultado 2025" fill="#34d399" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Resultado 2026" fill="#047857" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -273,111 +290,151 @@ export const ComparisonSection: React.FC<ComparisonSectionProps> = ({
       {/* Tabela Comparativa Completa Jan–Set */}
       <Card className="border-slate-200/80 shadow-sm overflow-hidden">
         <div className="p-5 border-b bg-slate-50/50">
-          <h4 className="font-semibold text-slate-900 text-sm">
+          <h4 className="font-bold text-slate-900 text-sm sm:text-base">
             Tabela Comparativa Mês a Mês (Jan–Set 2025 x 2026)
           </h4>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
             Variação absoluta (R$) e percentual (%) com indicadores em vermelho para quedas
           </p>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-xs text-left border-collapse">
+          <table className="w-full min-w-[980px] text-sm text-left border-collapse">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-100/70 text-slate-700 font-semibold uppercase text-[10px] tracking-wider">
-                <th className="py-3 px-4">Mês</th>
-                <th className="py-3 px-4 text-right">Receita 2025</th>
-                <th className="py-3 px-4 text-right">Receita 2026</th>
-                <th className="py-3 px-4 text-right">Var. Receita (R$)</th>
-                <th className="py-3 px-4 text-right">Var. %</th>
-                <th className="py-3 px-4 text-right">Margem '25</th>
-                <th className="py-3 px-4 text-right">Margem '26</th>
-                <th className="py-3 px-4 text-right">Resultado '25</th>
-                <th className="py-3 px-4 text-right">Resultado '26</th>
-                <th className="py-3 px-4 text-right">Var. Resultado</th>
+              <tr className="border-b border-slate-200 bg-slate-100/80 text-slate-800 font-bold uppercase text-xs tracking-wider">
+                <th className="py-3.5 px-4 whitespace-nowrap min-w-[100px]">Mês</th>
+                <th className="py-3.5 px-3 text-right whitespace-nowrap min-w-[110px]">
+                  Receita 2025
+                </th>
+                <th className="py-3.5 px-3 text-right whitespace-nowrap min-w-[110px]">
+                  Receita 2026
+                </th>
+                <th className="py-3.5 px-3 text-right whitespace-nowrap min-w-[125px]">
+                  Var. Receita (R$)
+                </th>
+                <th className="py-3.5 px-3 text-right whitespace-nowrap min-w-[85px]">Var. %</th>
+                <th className="py-3.5 px-3 text-right whitespace-nowrap min-w-[95px]">
+                  Margem '25
+                </th>
+                <th className="py-3.5 px-3 text-right whitespace-nowrap min-w-[95px]">
+                  Margem '26
+                </th>
+                <th className="py-3.5 px-3 text-right whitespace-nowrap min-w-[110px]">
+                  Resultado '25
+                </th>
+                <th className="py-3.5 px-3 text-right whitespace-nowrap min-w-[110px]">
+                  Resultado '26
+                </th>
+                <th className="py-3.5 px-4 text-right whitespace-nowrap min-w-[200px] bg-slate-100">
+                  Var. Resultado
+                </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
+            <tbody className="divide-y divide-slate-100 font-mono text-xs sm:text-sm">
               {comparisonRows.map((row, idx) => {
                 const isRevPos = row.revDiff >= 0
                 const isResPos = row.resDiff >= 0
                 return (
                   <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-3 px-4 font-sans font-medium text-slate-800">
+                    <td className="py-3.5 px-4 font-sans font-bold text-slate-900 whitespace-nowrap">
                       {row.monthName}
                     </td>
-                    <td className="py-3 px-4 text-right text-slate-600">{formatBRL(row.rev25)}</td>
-                    <td className="py-3 px-4 text-right text-blue-700 font-semibold">
+                    <td className="py-3.5 px-3 text-right text-slate-700 font-semibold whitespace-nowrap">
+                      {formatBRL(row.rev25)}
+                    </td>
+                    <td className="py-3.5 px-3 text-right text-blue-700 font-bold whitespace-nowrap">
                       {formatBRL(row.rev26)}
                     </td>
                     <td
-                      className={`py-3 px-4 text-right font-medium ${isRevPos ? 'text-emerald-600' : 'text-rose-600'}`}
+                      className={`py-3.5 px-3 text-right font-bold whitespace-nowrap ${isRevPos ? 'text-emerald-700' : 'text-rose-700'}`}
                     >
                       {isRevPos ? '+' : ''}
                       {formatBRL(row.revDiff)}
                     </td>
                     <td
-                      className={`py-3 px-4 text-right font-semibold ${isRevPos ? 'text-emerald-600' : 'text-rose-600'}`}
+                      className={`py-3.5 px-3 text-right font-extrabold whitespace-nowrap ${isRevPos ? 'text-emerald-700' : 'text-rose-700'}`}
                     >
                       {isRevPos ? '+' : ''}
                       {row.revDiffPct.toFixed(1)}%
                     </td>
-                    <td className="py-3 px-4 text-right text-slate-600">
+                    <td className="py-3.5 px-3 text-right text-slate-700 font-semibold whitespace-nowrap">
                       {formatPercent(row.mar25Pct)}
                     </td>
-                    <td className="py-3 px-4 text-right text-indigo-700 font-semibold">
+                    <td className="py-3.5 px-3 text-right text-amber-900 dark:text-amber-400 font-bold whitespace-nowrap">
                       {formatPercent(row.mar26Pct)}
                     </td>
-                    <td className="py-3 px-4 text-right text-slate-600">{formatBRL(row.res25)}</td>
-                    <td className="py-3 px-4 text-right text-emerald-700 font-semibold">
+                    <td className="py-3.5 px-3 text-right text-slate-700 font-semibold whitespace-nowrap">
+                      {formatBRL(row.res25)}
+                    </td>
+                    <td className="py-3.5 px-3 text-right text-emerald-700 font-bold whitespace-nowrap">
                       {formatBRL(row.res26)}
                     </td>
                     <td
-                      className={`py-3 px-4 text-right font-bold ${isResPos ? 'text-emerald-600' : 'text-rose-600'}`}
+                      className={`py-3.5 px-4 text-right font-black whitespace-nowrap min-w-[200px] bg-slate-50/40 ${isResPos ? 'text-emerald-700' : 'text-rose-700'}`}
                     >
-                      {isResPos ? '+' : ''}
-                      {formatBRL(row.resDiff)} ({isResPos ? '+' : ''}
-                      {row.resDiffPct.toFixed(1)}%)
+                      <div className="inline-flex items-center justify-end gap-1.5 flex-nowrap">
+                        <span>
+                          {isResPos ? '+' : ''}
+                          {formatBRL(row.resDiff)}
+                        </span>
+                        <span className="text-[11px] sm:text-xs font-bold px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200">
+                          {isResPos ? '+' : ''}
+                          {row.resDiffPct.toFixed(1)}%
+                        </span>
+                      </div>
                     </td>
                   </tr>
                 )
               })}
             </tbody>
             <tfoot>
-              <tr className="border-t-2 border-slate-300 bg-slate-100 font-semibold font-mono text-[11px] text-slate-900">
-                <td className="py-3 px-4 font-sans font-bold text-slate-950 uppercase tracking-wider text-[10px]">
+              <tr className="border-t-2 border-slate-300 bg-slate-100 font-bold font-mono text-xs sm:text-sm text-slate-900">
+                <td className="py-3.5 px-4 font-sans font-black text-slate-950 uppercase tracking-wider text-xs whitespace-nowrap">
                   Total Acumulado (Jan–Set)
                 </td>
-                <td className="py-3 px-4 text-right font-bold">{formatBRL(totalRev25)}</td>
-                <td className="py-3 px-4 text-right text-blue-700 font-bold">
+                <td className="py-3.5 px-3 text-right font-black text-slate-950 whitespace-nowrap">
+                  {formatBRL(totalRev25)}
+                </td>
+                <td className="py-3.5 px-3 text-right text-blue-700 font-black whitespace-nowrap">
                   {formatBRL(totalRev26)}
                 </td>
                 <td
-                  className={`py-3 px-4 text-right font-bold ${totalRevDiff >= 0 ? 'text-emerald-700' : 'text-rose-600'}`}
+                  className={`py-3.5 px-3 text-right font-black whitespace-nowrap ${totalRevDiff >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}
                 >
                   {totalRevDiff >= 0 ? '+' : ''}
                   {formatBRL(totalRevDiff)}
                 </td>
                 <td
-                  className={`py-3 px-4 text-right font-bold ${totalRevDiff >= 0 ? 'text-emerald-700' : 'text-rose-600'}`}
+                  className={`py-3.5 px-3 text-right font-black whitespace-nowrap ${totalRevDiff >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}
                 >
                   {totalRevDiff >= 0 ? '+' : ''}
                   {totalRevDiffPct.toFixed(1)}%
                 </td>
-                <td className="py-3 px-4 text-right font-bold">{formatPercent(totalMar25Pct)}</td>
-                <td className="py-3 px-4 text-right text-indigo-700 font-bold">
+                <td className="py-3.5 px-3 text-right font-black text-slate-800 whitespace-nowrap">
+                  {formatPercent(totalMar25Pct)}
+                </td>
+                <td className="py-3.5 px-3 text-right text-amber-900 dark:text-amber-400 font-black whitespace-nowrap">
                   {formatPercent(totalMar26Pct)}
                 </td>
-                <td className="py-3 px-4 text-right font-bold">{formatBRL(totalRes25)}</td>
-                <td className="py-3 px-4 text-right text-emerald-700 font-bold">
+                <td className="py-3.5 px-3 text-right font-black text-slate-800 whitespace-nowrap">
+                  {formatBRL(totalRes25)}
+                </td>
+                <td className="py-3.5 px-3 text-right text-emerald-700 font-black whitespace-nowrap">
                   {formatBRL(totalRes26)}
                 </td>
                 <td
-                  className={`py-3 px-4 text-right font-extrabold ${totalResDiff >= 0 ? 'text-emerald-700' : 'text-rose-600'}`}
+                  className={`py-3.5 px-4 text-right font-black text-sm whitespace-nowrap min-w-[200px] bg-slate-200/50 ${totalResDiff >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}
                 >
-                  {totalResDiff >= 0 ? '+' : ''}
-                  {formatBRL(totalResDiff)} ({totalResDiff >= 0 ? '+' : ''}
-                  {totalResDiffPct.toFixed(1)}%)
+                  <div className="inline-flex items-center justify-end gap-1.5 flex-nowrap">
+                    <span>
+                      {totalResDiff >= 0 ? '+' : ''}
+                      {formatBRL(totalResDiff)}
+                    </span>
+                    <span className="text-xs font-black px-1.5 py-0.5 rounded bg-white shadow-2xs border border-slate-300">
+                      {totalResDiff >= 0 ? '+' : ''}
+                      {totalResDiffPct.toFixed(1)}%
+                    </span>
+                  </div>
                 </td>
               </tr>
             </tfoot>

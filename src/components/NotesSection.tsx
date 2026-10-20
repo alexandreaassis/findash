@@ -59,14 +59,16 @@ export const NotesSection: React.FC<NotesSectionProps> = ({ notes }) => {
                 <div className="p-2.5 rounded-xl bg-slate-100 shrink-0">
                   {getIcon(note.category)}
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                    <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700">
                       {getCategoryLabel(note.category)}
                     </span>
                   </div>
-                  <h4 className="text-sm font-bold text-slate-900">{note.title}</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed pt-1">{note.content}</p>
+                  <h4 className="text-base font-extrabold text-slate-900">{note.title}</h4>
+                  <p className="text-sm font-normal text-slate-700 leading-relaxed pt-1">
+                    {note.content}
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -75,37 +77,38 @@ export const NotesSection: React.FC<NotesSectionProps> = ({ notes }) => {
       </div>
 
       {/* Destaque Metodológico de Leitura Financeira */}
-      <Card className="border-indigo-100 bg-indigo-50/40 shadow-sm">
-        <CardContent className="p-5">
-          <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
-            <div className="space-y-1 text-xs text-indigo-950">
-              <h5 className="font-bold text-indigo-900">
+      <Card className="border-indigo-200 bg-indigo-50/60 shadow-sm">
+        <CardContent className="p-5 sm:p-6">
+          <div className="flex items-start gap-3.5">
+            <Info className="w-6 h-6 text-indigo-700 shrink-0 mt-0.5" />
+            <div className="space-y-2 text-sm text-indigo-950">
+              <h5 className="font-extrabold text-base text-indigo-950">
                 Glossário Rápido da Estrutura de DRE da Empresa
               </h5>
-              <ul className="list-disc list-inside space-y-1 text-[11px] text-indigo-900/80 mt-1">
+              <ul className="list-disc list-inside space-y-2 text-xs sm:text-sm text-indigo-950 font-medium mt-2 leading-relaxed">
                 <li>
-                  <strong className="text-indigo-950">Receita Bruta:</strong> Faturamento total
-                  faturado no período.
+                  <strong className="text-indigo-950 font-bold">Receita Bruta:</strong> Faturamento
+                  total faturado no período.
                 </li>
                 <li>
-                  <strong className="text-indigo-950">Deduções Totais:</strong> Soma de impostos s/
-                  faturamento, custo de mercadorias/serviços, devoluções, comissões, royalties,
-                  propaganda e fretes (em 2026).
+                  <strong className="text-indigo-950 font-bold">Deduções Totais:</strong> Soma de
+                  impostos s/ faturamento, custo de mercadorias/serviços, devoluções, comissões,
+                  royalties, propaganda e fretes (em 2026).
                 </li>
                 <li>
-                  <strong className="text-indigo-950">Margem de Contribuição:</strong> Receita Bruta
-                  menos Deduções Totais. O percentual indica quanto sobra de cada R$ 100 vendidos
-                  para cobrir as despesas operacionais e gerar lucro.
+                  <strong className="text-indigo-950 font-bold">Margem de Contribuição:</strong>{' '}
+                  Receita Bruta menos Deduções Totais. O percentual indica quanto sobra de cada R$
+                  100 vendidos para cobrir as despesas operacionais e gerar lucro.
                 </li>
                 <li>
-                  <strong className="text-indigo-950">Despesas Operacionais:</strong> Despesas
-                  administrativas, comerciais, financeiras e custo com pessoal/funcionários.
+                  <strong className="text-indigo-950 font-bold">Despesas Operacionais:</strong>{' '}
+                  Despesas administrativas, comerciais, financeiras e custo com
+                  pessoal/funcionários.
                 </li>
                 <li>
-                  <strong className="text-indigo-950">Resultado Operacional:</strong> Margem de
-                  Contribuição deduzida das Despesas Operacionais (EBITDA contábil). Valores
-                  negativos indicam déficit no mês e são exibidos em vermelho.
+                  <strong className="text-indigo-950 font-bold">Resultado Operacional:</strong>{' '}
+                  Margem de Contribuição deduzida das Despesas Operacionais (EBITDA contábil).
+                  Valores negativos indicam déficit no mês e são exibidos em vermelho.
                 </li>
               </ul>
             </div>

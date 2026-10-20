@@ -140,100 +140,107 @@ export const RevenueDeductionsSection: React.FC<RevenueDeductionsSectionProps> =
             </div>
           </CardContent>
         </Card>
-
         {/* Tabela Decomposta Mês a Mês das Deduções */}
         <Card className="border-slate-200/80 shadow-sm overflow-hidden lg:col-span-2">
           <div className="p-5 border-b bg-slate-50/50">
-            <h4 className="font-semibold text-slate-900 text-sm">
+            <h4 className="font-bold text-slate-900 text-sm sm:text-base">
               Valores Mensais e Acumulados das Deduções ({selectedYear})
             </h4>
-            <p className="text-xs text-muted-foreground mt-0.5">Valores expressos em Reais (R$)</p>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+              Valores expressos em Reais (R$)
+            </p>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-xs text-left border-collapse">
+            <table className="w-full min-w-[760px] text-sm text-left border-collapse">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-100/70 text-slate-700 font-semibold uppercase text-[10px] tracking-wider">
-                  <th className="py-3 px-3">Mês</th>
-                  <th className="py-3 px-3 text-right">Rec. Bruta</th>
-                  <th className="py-3 px-3 text-right">Imp. Vendas</th>
-                  <th className="py-3 px-3 text-right">Custo Direto</th>
-                  <th className="py-3 px-3 text-right">Devoluções</th>
-                  <th className="py-3 px-3 text-right">Comissões</th>
-                  <th className="py-3 px-3 text-right">Royalties</th>
-                  <th className="py-3 px-3 text-right">Propaganda</th>
+                <tr className="border-b border-slate-200 bg-slate-100/80 text-slate-800 font-bold uppercase text-xs tracking-wider">
+                  <th className="py-3 px-3 whitespace-nowrap">Mês</th>
+                  <th className="py-3 px-3 text-right whitespace-nowrap">Rec. Bruta</th>
+                  <th className="py-3 px-3 text-right whitespace-nowrap">Imp. Vendas</th>
+                  <th className="py-3 px-3 text-right whitespace-nowrap">Custo Direto</th>
+                  <th className="py-3 px-3 text-right whitespace-nowrap">Devoluções</th>
+                  <th className="py-3 px-3 text-right whitespace-nowrap">Comissões</th>
+                  <th className="py-3 px-3 text-right whitespace-nowrap">Royalties</th>
+                  <th className="py-3 px-3 text-right whitespace-nowrap">Propaganda</th>
                   {selectedYear === 2026 ? (
-                    <th className="py-3 px-3 text-right text-indigo-700">Fretes</th>
+                    <th className="py-3 px-3 text-right text-indigo-700 whitespace-nowrap">
+                      Fretes
+                    </th>
                   ) : (
-                    <th className="py-3 px-3 text-right text-slate-400">Fretes</th>
+                    <th className="py-3 px-3 text-right text-slate-400 whitespace-nowrap">
+                      Fretes
+                    </th>
                   )}
-                  <th className="py-3 px-3 text-right text-rose-700">Total Deduções</th>
+                  <th className="py-3 px-3 text-right text-rose-700 whitespace-nowrap">
+                    Total Deduções
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
+              <tbody className="divide-y divide-slate-100 font-mono text-xs sm:text-sm">
                 {activeEntries.map((row, idx) => {
                   const isClosed = row.has_closing !== false
 
                   if (!isClosed) {
                     return (
                       <tr key={idx} className="hover:bg-slate-50/80 opacity-60 transition-colors">
-                        <td className="py-2.5 px-3 font-sans font-medium text-slate-500">
+                        <td className="py-2.5 px-3 font-sans font-semibold text-slate-500 whitespace-nowrap">
                           {row.month_name?.slice(0, 3) || `Mês ${row.month}`}
-                          <span className="ml-1 text-[9px] text-amber-600 bg-amber-50 px-1 py-0.2 rounded font-sans">
+                          <span className="ml-1 text-[10px] text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded font-sans font-bold">
                             Aberto
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 text-right text-slate-400">—</td>
-                        <td className="py-2.5 px-3 text-right text-slate-400">—</td>
-                        <td className="py-2.5 px-3 text-right text-slate-400">—</td>
-                        <td className="py-2.5 px-3 text-right text-slate-400">—</td>
-                        <td className="py-2.5 px-3 text-right text-slate-400">—</td>
-                        <td className="py-2.5 px-3 text-right text-slate-400">—</td>
-                        <td className="py-2.5 px-3 text-right text-slate-400">—</td>
-                        <td className="py-2.5 px-3 text-right text-slate-400">—</td>
-                        <td className="py-2.5 px-3 text-right text-slate-400">—</td>
+                        <td className="py-2.5 px-3 text-right text-slate-400 font-medium">—</td>
+                        <td className="py-2.5 px-3 text-right text-slate-400 font-medium">—</td>
+                        <td className="py-2.5 px-3 text-right text-slate-400 font-medium">—</td>
+                        <td className="py-2.5 px-3 text-right text-slate-400 font-medium">—</td>
+                        <td className="py-2.5 px-3 text-right text-slate-400 font-medium">—</td>
+                        <td className="py-2.5 px-3 text-right text-slate-400 font-medium">—</td>
+                        <td className="py-2.5 px-3 text-right text-slate-400 font-medium">—</td>
+                        <td className="py-2.5 px-3 text-right text-slate-400 font-medium">—</td>
+                        <td className="py-2.5 px-3 text-right text-slate-400 font-medium">—</td>
                       </tr>
                     )
                   }
 
                   return (
                     <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-2.5 px-3 font-sans font-medium text-slate-800">
+                      <td className="py-2.5 px-3 font-sans font-bold text-slate-900 whitespace-nowrap">
                         {row.month_name?.slice(0, 3) || `Mês ${row.month}`}
                       </td>
-                      <td className="py-2.5 px-3 text-right font-semibold text-slate-900">
+                      <td className="py-2.5 px-3 text-right font-bold text-slate-950 whitespace-nowrap">
                         {formatBRL(row.gross_revenue)}
                       </td>
-                      <td className="py-2.5 px-3 text-right text-slate-600">
+                      <td className="py-2.5 px-3 text-right text-slate-700 font-medium whitespace-nowrap">
                         {formatBRL(row.deductions_taxes)}
                       </td>
-                      <td className="py-2.5 px-3 text-right text-slate-600">
+                      <td className="py-2.5 px-3 text-right text-slate-700 font-medium whitespace-nowrap">
                         {formatBRL(row.deductions_costs)}
                       </td>
-                      <td className="py-2.5 px-3 text-right text-slate-600">
+                      <td className="py-2.5 px-3 text-right text-slate-700 font-medium whitespace-nowrap">
                         {formatBRL(row.deductions_returns)}
                       </td>
-                      <td className="py-2.5 px-3 text-right text-slate-600">
+                      <td className="py-2.5 px-3 text-right text-slate-700 font-medium whitespace-nowrap">
                         {formatBRL(row.deductions_commissions)}
                       </td>
-                      <td className="py-2.5 px-3 text-right text-slate-600">
+                      <td className="py-2.5 px-3 text-right text-slate-700 font-medium whitespace-nowrap">
                         {formatBRL(row.deductions_royalties)}
                       </td>
-                      <td className="py-2.5 px-3 text-right text-slate-600">
+                      <td className="py-2.5 px-3 text-right text-slate-700 font-medium whitespace-nowrap">
                         {formatBRL(row.deductions_marketing)}
                       </td>
                       {selectedYear === 2026 ? (
-                        <td className="py-2.5 px-3 text-right text-indigo-700 font-medium">
+                        <td className="py-2.5 px-3 text-right text-indigo-700 font-semibold whitespace-nowrap">
                           {row.deductions_freight !== undefined
                             ? formatBRL(row.deductions_freight)
                             : '—'}
                         </td>
                       ) : (
-                        <td className="py-2.5 px-3 text-right text-slate-400 italic font-sans text-[10px]">
+                        <td className="py-2.5 px-3 text-right text-slate-400 italic font-sans text-xs whitespace-nowrap">
                           —
                         </td>
                       )}
-                      <td className="py-2.5 px-3 text-right font-bold text-rose-600">
+                      <td className="py-2.5 px-3 text-right font-black text-rose-700 whitespace-nowrap">
                         -{formatBRL(row.total_deductions)}
                       </td>
                     </tr>
@@ -241,27 +248,41 @@ export const RevenueDeductionsSection: React.FC<RevenueDeductionsSectionProps> =
                 })}
               </tbody>
               <tfoot>
-                <tr className="border-t-2 border-slate-300 bg-slate-100 font-semibold font-mono text-[11px] text-slate-900">
-                  <td className="py-3 px-3 font-sans font-bold text-slate-950 uppercase text-[10px]">
+                <tr className="border-t-2 border-slate-300 bg-slate-100 font-bold font-mono text-xs sm:text-sm text-slate-900">
+                  <td className="py-3 px-3 font-sans font-black text-slate-950 uppercase text-xs whitespace-nowrap">
                     Total Fechado
                   </td>
-                  <td className="py-3 px-3 text-right font-bold">{formatBRL(totalRevenue)}</td>
-                  <td className="py-3 px-3 text-right font-bold">{formatBRL(sumTaxes)}</td>
-                  <td className="py-3 px-3 text-right font-bold">{formatBRL(sumCosts)}</td>
-                  <td className="py-3 px-3 text-right font-bold">{formatBRL(sumReturns)}</td>
-                  <td className="py-3 px-3 text-right font-bold">{formatBRL(sumCommissions)}</td>
-                  <td className="py-3 px-3 text-right font-bold">{formatBRL(sumRoyalties)}</td>
-                  <td className="py-3 px-3 text-right font-bold">{formatBRL(sumMarketing)}</td>
+                  <td className="py-3 px-3 text-right font-black text-slate-950 whitespace-nowrap">
+                    {formatBRL(totalRevenue)}
+                  </td>
+                  <td className="py-3 px-3 text-right font-black text-slate-900 whitespace-nowrap">
+                    {formatBRL(sumTaxes)}
+                  </td>
+                  <td className="py-3 px-3 text-right font-black text-slate-900 whitespace-nowrap">
+                    {formatBRL(sumCosts)}
+                  </td>
+                  <td className="py-3 px-3 text-right font-black text-slate-900 whitespace-nowrap">
+                    {formatBRL(sumReturns)}
+                  </td>
+                  <td className="py-3 px-3 text-right font-black text-slate-900 whitespace-nowrap">
+                    {formatBRL(sumCommissions)}
+                  </td>
+                  <td className="py-3 px-3 text-right font-black text-slate-900 whitespace-nowrap">
+                    {formatBRL(sumRoyalties)}
+                  </td>
+                  <td className="py-3 px-3 text-right font-black text-slate-900 whitespace-nowrap">
+                    {formatBRL(sumMarketing)}
+                  </td>
                   {selectedYear === 2026 ? (
-                    <td className="py-3 px-3 text-right text-indigo-700 font-bold">
+                    <td className="py-3 px-3 text-right text-indigo-800 font-black whitespace-nowrap">
                       {formatBRL(sumFreight)}
                     </td>
                   ) : (
-                    <td className="py-3 px-3 text-right text-slate-400 italic font-sans text-[10px]">
+                    <td className="py-3 px-3 text-right text-slate-400 italic font-sans text-xs whitespace-nowrap">
                       Ausente
                     </td>
                   )}
-                  <td className="py-3 px-3 text-right font-extrabold text-rose-600">
+                  <td className="py-3 px-3 text-right font-black text-rose-700 whitespace-nowrap">
                     -{formatBRL(totalDeductions)}
                   </td>
                 </tr>
@@ -269,6 +290,23 @@ export const RevenueDeductionsSection: React.FC<RevenueDeductionsSectionProps> =
             </table>
           </div>
         </Card>
+        =======
+        <div className="w-full space-y-1.5 mt-3">
+          {pieData.map((item, idx) => (
+            <div key={idx} className="flex items-center justify-between text-xs sm:text-sm">
+              <span className="flex items-center gap-2 text-slate-800 font-semibold">
+                <span
+                  className="w-3 h-3 rounded-xs"
+                  style={{ backgroundColor: COLORS[idx % COLORS.length] }}
+                />
+                {item.name}
+              </span>
+              <span className="font-mono font-bold text-slate-950">
+                {totalDeductions > 0 ? ((item.value / totalDeductions) * 100).toFixed(1) : 0}%
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )

@@ -67,18 +67,18 @@ export const IndicatorsSection: React.FC<IndicatorsSectionProps> = ({
           </p>
         </div>
         <CardContent className="p-4 sm:p-6">
-          <div className="h-80 w-full">
+          <div className="h-80 sm:h-96 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 20, right: 10, left: 10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis
                   dataKey="name"
-                  tick={{ fontSize: 11, fill: '#64748b' }}
-                  axisLine={false}
+                  tick={{ fontSize: 13, fill: '#334155', fontWeight: 600 }}
+                  axisLine={{ stroke: '#cbd5e1' }}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fontSize: 11, fill: '#64748b' }}
+                  tick={{ fontSize: 12, fill: '#334155', fontWeight: 600 }}
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={(val) => `R$ ${(val / 1000).toFixed(0)}k`}
@@ -87,31 +87,39 @@ export const IndicatorsSection: React.FC<IndicatorsSectionProps> = ({
                   formatter={(val: any) => [formatBRL(Number(val)), '']}
                   contentStyle={{
                     backgroundColor: '#0f172a',
-                    borderColor: '#1e293b',
+                    borderColor: '#334155',
                     borderRadius: '8px',
                     color: '#fff',
-                    fontSize: '12px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    padding: '8px 12px',
                   }}
                 />
-                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                <Bar dataKey="receita" name="Receita Bruta" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="deducoes" name="Deduções" fill="#f43f5e" radius={[4, 4, 0, 0]} />
+                <Legend
+                  wrapperStyle={{
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    paddingTop: '12px',
+                  }}
+                />
+                <Bar dataKey="receita" name="Receita Bruta" fill="#1d4ed8" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="deducoes" name="Deduções" fill="#e11d48" radius={[4, 4, 0, 0]} />
                 <Bar
                   dataKey="margem"
                   name="Margem Contribuição"
-                  fill="#6366f1"
+                  fill="#d97706"
                   radius={[4, 4, 0, 0]}
                 />
                 <Bar
                   dataKey="despesas"
                   name="Despesas Totais"
-                  fill="#f59e0b"
+                  fill="#7c3aed"
                   radius={[4, 4, 0, 0]}
                 />
                 <Bar
                   dataKey="resultado"
                   name="Resultado Operacional"
-                  fill="#10b981"
+                  fill="#059669"
                   radius={[4, 4, 0, 0]}
                 />
               </BarChart>
@@ -132,20 +140,20 @@ export const IndicatorsSection: React.FC<IndicatorsSectionProps> = ({
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-xs text-left border-collapse">
+          <table className="w-full text-sm text-left border-collapse">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-100/70 text-slate-700 font-semibold uppercase text-[10px] tracking-wider">
-                <th className="py-3 px-4">Mês</th>
-                <th className="py-3 px-4 text-right">Receita Bruta</th>
-                <th className="py-3 px-4 text-right">Deduções Totais</th>
-                <th className="py-3 px-4 text-right">Margem Contribuição</th>
-                <th className="py-3 px-4 text-right">% Margem</th>
-                <th className="py-3 px-4 text-right">Despesas Operacionais</th>
-                <th className="py-3 px-4 text-right">Resultado Operacional</th>
-                <th className="py-3 px-4 text-right">% Resultado</th>
+              <tr className="border-b border-slate-200 bg-slate-100/80 text-slate-800 font-bold uppercase text-xs tracking-wider">
+                <th className="py-3.5 px-4">Mês</th>
+                <th className="py-3.5 px-4 text-right">Receita Bruta</th>
+                <th className="py-3.5 px-4 text-right">Deduções Totais</th>
+                <th className="py-3.5 px-4 text-right">Margem Contribuição</th>
+                <th className="py-3.5 px-4 text-right">% Margem</th>
+                <th className="py-3.5 px-4 text-right">Despesas Operacionais</th>
+                <th className="py-3.5 px-4 text-right">Resultado Operacional</th>
+                <th className="py-3.5 px-4 text-right">% Resultado</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
+            <tbody className="divide-y divide-slate-100 font-mono text-xs sm:text-sm">
               {activeEntries.map((row, idx) => {
                 const isClosed = row.has_closing !== false
                 const isNegativeResult = row.operating_result < 0
@@ -153,50 +161,50 @@ export const IndicatorsSection: React.FC<IndicatorsSectionProps> = ({
                 if (!isClosed) {
                   return (
                     <tr key={idx} className="hover:bg-slate-50/80 opacity-60 transition-colors">
-                      <td className="py-3 px-4 font-sans font-medium text-slate-500">
+                      <td className="py-3.5 px-4 font-sans font-semibold text-slate-500">
                         {row.month_name || `Mês ${row.month}`}
-                        <span className="ml-2 text-[10px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded font-sans">
+                        <span className="ml-2 text-xs text-amber-700 bg-amber-100 font-bold px-2 py-0.5 rounded font-sans">
                           Em aberto
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-right text-slate-400">—</td>
-                      <td className="py-3 px-4 text-right text-slate-400">—</td>
-                      <td className="py-3 px-4 text-right text-slate-400">—</td>
-                      <td className="py-3 px-4 text-right text-slate-400">—</td>
-                      <td className="py-3 px-4 text-right text-slate-400">—</td>
-                      <td className="py-3 px-4 text-right text-slate-400">—</td>
-                      <td className="py-3 px-4 text-right text-slate-400">—</td>
+                      <td className="py-3.5 px-4 text-right text-slate-400 font-medium">—</td>
+                      <td className="py-3.5 px-4 text-right text-slate-400 font-medium">—</td>
+                      <td className="py-3.5 px-4 text-right text-slate-400 font-medium">—</td>
+                      <td className="py-3.5 px-4 text-right text-slate-400 font-medium">—</td>
+                      <td className="py-3.5 px-4 text-right text-slate-400 font-medium">—</td>
+                      <td className="py-3.5 px-4 text-right text-slate-400 font-medium">—</td>
+                      <td className="py-3.5 px-4 text-right text-slate-400 font-medium">—</td>
                     </tr>
                   )
                 }
 
                 return (
                   <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-3 px-4 font-sans font-medium text-slate-800">
+                    <td className="py-3.5 px-4 font-sans font-bold text-slate-900">
                       {row.month_name || `Mês ${row.month}`}
                     </td>
-                    <td className="py-3 px-4 text-right text-slate-900 font-semibold">
+                    <td className="py-3.5 px-4 text-right text-slate-950 font-bold">
                       {formatBRL(row.gross_revenue)}
                     </td>
-                    <td className="py-3 px-4 text-right text-rose-600">
+                    <td className="py-3.5 px-4 text-right text-rose-700 font-bold">
                       -{formatBRL(row.total_deductions)}
                     </td>
-                    <td className="py-3 px-4 text-right text-indigo-700 font-semibold">
+                    <td className="py-3.5 px-4 text-right text-amber-900 dark:text-amber-400 font-extrabold">
                       {formatBRL(row.contribution_margin)}
                     </td>
-                    <td className="py-3 px-4 text-right text-indigo-600">
+                    <td className="py-3.5 px-4 text-right text-amber-800 dark:text-amber-300 font-bold">
                       {formatPercent(row.contribution_margin_pct)}
                     </td>
-                    <td className="py-3 px-4 text-right text-amber-700">
+                    <td className="py-3.5 px-4 text-right text-purple-900 dark:text-purple-300 font-bold">
                       -{formatBRL(row.total_expenses)}
                     </td>
                     <td
-                      className={`py-3 px-4 text-right font-bold ${isNegativeResult ? 'text-rose-600' : 'text-emerald-700'}`}
+                      className={`py-3.5 px-4 text-right font-black ${isNegativeResult ? 'text-rose-700' : 'text-emerald-700'}`}
                     >
                       {formatBRL(row.operating_result)}
                     </td>
                     <td
-                      className={`py-3 px-4 text-right font-semibold ${isNegativeResult ? 'text-rose-600' : 'text-emerald-700'}`}
+                      className={`py-3.5 px-4 text-right font-extrabold ${isNegativeResult ? 'text-rose-700' : 'text-emerald-700'}`}
                     >
                       {formatPercent(row.operating_result_pct)}
                     </td>
@@ -218,30 +226,32 @@ export const IndicatorsSection: React.FC<IndicatorsSectionProps> = ({
                 const isNeg = sumRes < 0
 
                 return (
-                  <tr className="border-t-2 border-slate-300 bg-slate-100 font-semibold font-mono text-[11px] text-slate-900">
-                    <td className="py-3 px-4 font-sans font-bold text-slate-950 uppercase tracking-wider text-[10px]">
+                  <tr className="border-t-2 border-slate-300 bg-slate-100 font-bold font-mono text-xs sm:text-sm text-slate-900">
+                    <td className="py-3.5 px-4 font-sans font-black text-slate-950 uppercase tracking-wider text-xs">
                       Total Acumulado ({closedEntries.length} meses)
                     </td>
-                    <td className="py-3 px-4 text-right font-bold">{formatBRL(sumRev)}</td>
-                    <td className="py-3 px-4 text-right text-rose-600 font-bold">
+                    <td className="py-3.5 px-4 text-right font-black text-slate-950">
+                      {formatBRL(sumRev)}
+                    </td>
+                    <td className="py-3.5 px-4 text-right text-rose-700 font-black">
                       -{formatBRL(sumDed)}
                     </td>
-                    <td className="py-3 px-4 text-right text-indigo-700 font-bold">
+                    <td className="py-3.5 px-4 text-right text-amber-900 dark:text-amber-400 font-black">
                       {formatBRL(sumMar)}
                     </td>
-                    <td className="py-3 px-4 text-right text-indigo-700 font-bold">
+                    <td className="py-3.5 px-4 text-right text-amber-900 dark:text-amber-400 font-black">
                       {formatPercent(marPct)}
                     </td>
-                    <td className="py-3 px-4 text-right text-amber-800 font-bold">
+                    <td className="py-3.5 px-4 text-right text-purple-950 font-black">
                       -{formatBRL(sumExp)}
                     </td>
                     <td
-                      className={`py-3 px-4 text-right font-extrabold ${isNeg ? 'text-rose-600' : 'text-emerald-700'}`}
+                      className={`py-3.5 px-4 text-right font-black text-base ${isNeg ? 'text-rose-700' : 'text-emerald-700'}`}
                     >
                       {formatBRL(sumRes)}
                     </td>
                     <td
-                      className={`py-3 px-4 text-right font-bold ${isNeg ? 'text-rose-600' : 'text-emerald-700'}`}
+                      className={`py-3.5 px-4 text-right font-black ${isNeg ? 'text-rose-700' : 'text-emerald-700'}`}
                     >
                       {formatPercent(resPct)}
                     </td>

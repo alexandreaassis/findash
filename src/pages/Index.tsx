@@ -297,16 +297,18 @@ export default function Index() {
           <>
             {/* Barra de Navegação de Seções */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl p-2 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 print:hidden">
-              <nav className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+              <nav className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
                 <Button
                   variant={activeSection === 'overview' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setActiveSection('overview')}
-                  className={`text-xs h-8 rounded-xl font-medium shrink-0 ${
-                    activeSection === 'overview' ? 'bg-indigo-600 text-white' : 'text-slate-600'
+                  className={`text-xs sm:text-sm h-9 rounded-xl font-bold shrink-0 ${
+                    activeSection === 'overview'
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'text-slate-700 hover:text-slate-950'
                   }`}
                 >
-                  <BarChart3 className="w-3.5 h-3.5 mr-1.5" />
+                  <BarChart3 className="w-4 h-4 mr-1.5" />
                   Visão Geral
                 </Button>
 
@@ -314,11 +316,13 @@ export default function Index() {
                   variant={activeSection === 'indicators' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setActiveSection('indicators')}
-                  className={`text-xs h-8 rounded-xl font-medium shrink-0 ${
-                    activeSection === 'indicators' ? 'bg-indigo-600 text-white' : 'text-slate-600'
+                  className={`text-xs sm:text-sm h-9 rounded-xl font-bold shrink-0 ${
+                    activeSection === 'indicators'
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'text-slate-700 hover:text-slate-950'
                   }`}
                 >
-                  <TrendingUp className="w-3.5 h-3.5 mr-1.5" />
+                  <TrendingUp className="w-4 h-4 mr-1.5" />
                   Indicadores
                 </Button>
 
@@ -329,11 +333,13 @@ export default function Index() {
                     setActiveSection('comparison')
                     setSelectedYearTab('comparison')
                   }}
-                  className={`text-xs h-8 rounded-xl font-medium shrink-0 ${
-                    activeSection === 'comparison' ? 'bg-indigo-600 text-white' : 'text-slate-600'
+                  className={`text-xs sm:text-sm h-9 rounded-xl font-bold shrink-0 ${
+                    activeSection === 'comparison'
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'text-slate-700 hover:text-slate-950'
                   }`}
                 >
-                  <GitCompare className="w-3.5 h-3.5 mr-1.5" />
+                  <GitCompare className="w-4 h-4 mr-1.5" />
                   Comparação 2025 x 2026
                 </Button>
 
@@ -341,13 +347,13 @@ export default function Index() {
                   variant={activeSection === 'revenue-deductions' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setActiveSection('revenue-deductions')}
-                  className={`text-xs h-8 rounded-xl font-medium shrink-0 ${
+                  className={`text-xs sm:text-sm h-9 rounded-xl font-bold shrink-0 ${
                     activeSection === 'revenue-deductions'
-                      ? 'bg-indigo-600 text-white'
-                      : 'text-slate-600'
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'text-slate-700 hover:text-slate-950'
                   }`}
                 >
-                  <Percent className="w-3.5 h-3.5 mr-1.5" />
+                  <Percent className="w-4 h-4 mr-1.5" />
                   Receitas & Deduções
                 </Button>
 
@@ -355,11 +361,13 @@ export default function Index() {
                   variant={activeSection === 'expenses' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setActiveSection('expenses')}
-                  className={`text-xs h-8 rounded-xl font-medium shrink-0 ${
-                    activeSection === 'expenses' ? 'bg-indigo-600 text-white' : 'text-slate-600'
+                  className={`text-xs sm:text-sm h-9 rounded-xl font-bold shrink-0 ${
+                    activeSection === 'expenses'
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'text-slate-700 hover:text-slate-950'
                   }`}
                 >
-                  <Layers className="w-3.5 h-3.5 mr-1.5" />
+                  <Layers className="w-4 h-4 mr-1.5" />
                   Despesas Operacionais
                 </Button>
 
@@ -367,11 +375,13 @@ export default function Index() {
                   variant={activeSection === 'notes' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setActiveSection('notes')}
-                  className={`text-xs h-8 rounded-xl font-medium shrink-0 ${
-                    activeSection === 'notes' ? 'bg-indigo-600 text-white' : 'text-slate-600'
+                  className={`text-xs sm:text-sm h-9 rounded-xl font-bold shrink-0 ${
+                    activeSection === 'notes'
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'text-slate-700 hover:text-slate-950'
                   }`}
                 >
-                  <HelpCircle className="w-3.5 h-3.5 mr-1.5" />
+                  <HelpCircle className="w-4 h-4 mr-1.5" />
                   Notas & Leitura
                 </Button>
               </nav>
@@ -393,14 +403,23 @@ export default function Index() {
                   }}
                   className="w-auto"
                 >
-                  <TabsList className="h-8 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
-                    <TabsTrigger value="2025" className="text-xs px-3 py-1 rounded-lg">
+                  <TabsList className="h-9 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                    <TabsTrigger
+                      value="2025"
+                      className="text-xs sm:text-sm font-bold px-3 py-1 rounded-lg"
+                    >
                       2025
                     </TabsTrigger>
-                    <TabsTrigger value="2026" className="text-xs px-3 py-1 rounded-lg">
+                    <TabsTrigger
+                      value="2026"
+                      className="text-xs sm:text-sm font-bold px-3 py-1 rounded-lg"
+                    >
                       2026
                     </TabsTrigger>
-                    <TabsTrigger value="comparison" className="text-xs px-3 py-1 rounded-lg">
+                    <TabsTrigger
+                      value="comparison"
+                      className="text-xs sm:text-sm font-bold px-3 py-1 rounded-lg"
+                    >
                       Jan–Set Comparativo
                     </TabsTrigger>
                   </TabsList>
