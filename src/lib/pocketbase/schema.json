@@ -1,0 +1,317 @@
+{
+  "generatedAt": "2026-10-20T15:52:49.996Z",
+  "collections": [
+    {
+      "name": "users",
+      "type": "auth",
+      "apiRules": {
+        "list": "id = @request.auth.id",
+        "view": "id = @request.auth.id",
+        "create": "",
+        "update": "id = @request.auth.id",
+        "delete": "id = @request.auth.id"
+      },
+      "fields": [
+        {
+          "name": "name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "avatar",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX `idx_tokenKey__pb_users_auth_` ON `users` (`tokenKey`)",
+        "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
+      ]
+    },
+    {
+      "name": "app_config",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "",
+        "update": "",
+        "delete": ""
+      },
+      "fields": [
+        {
+          "name": "config_key",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "config_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE UNIQUE INDEX idx_app_config_key ON app_config (config_key)"]
+    },
+    {
+      "name": "dre_entries",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "",
+        "update": "",
+        "delete": ""
+      },
+      "fields": [
+        {
+          "name": "year",
+          "type": "number",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "period_type",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["monthly", "ytd", "summary"]
+        },
+        {
+          "name": "month",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "month_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "gross_revenue",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "deductions_taxes",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "deductions_costs",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "deductions_returns",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "deductions_commissions",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "deductions_royalties",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "deductions_marketing",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "deductions_freight",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "total_deductions",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "contribution_margin",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "contribution_margin_pct",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "expenses_admin",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "expenses_commercial",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "expenses_financial",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "expenses_personnel",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "total_expenses",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "operating_result",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "operating_result_pct",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_dre_year_month ON dre_entries (year, month)",
+        "CREATE INDEX idx_dre_period_type ON dre_entries (year, period_type)"
+      ]
+    },
+    {
+      "name": "dre_notes",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "",
+        "update": "",
+        "delete": ""
+      },
+      "fields": [
+        {
+          "name": "title",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "category",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["period", "source", "methodology", "general"]
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "order_num",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": []
+    }
+  ]
+}
